@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Plot the panels of Figure 2.')
     parser.add_argument('--output-dir', dest='output_dir', type=str,
-                        default='3_figures/figure_2/',
+                        default='figures/figure_2/',
                         help='The directory where to store the figure panels.')
     parser.add_argument('--extension', dest='extension', type=str,
                         default='eps',
