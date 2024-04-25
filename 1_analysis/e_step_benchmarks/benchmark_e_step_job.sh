@@ -31,7 +31,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step_old_viprs.py \
       --file-prefix "chr_$CHROM"
 
 # Deactivate the virtual environment:
-source deactivate
+deactivate
 
 # ------------------------------------------------------------
 # Time the E-Step of the new implementation of VIPRS:
