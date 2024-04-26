@@ -26,7 +26,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step_old_viprs.py \
       --temp-dir temp \
       --output-dir data/benchmark_results/old_viprs/ \
       --ld-panel "data/ld/eur/old_format/ukbb_50k_windowed/chr_$CHROM" \
-      --sumstats "data/sumstats/benchmark_sumstats/chr_$CHROM" \
+      --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --file-prefix "chr_$CHROM"
 
@@ -45,7 +45,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --output-dir data/benchmark_results/e_step/new_viprs/ \
       --model all \
       --ld-panel "data/ld/eur/converted/ukbb_50k_windowed/int8/chr_$CHROM" \
-      --sumstats "data/sumstats/benchmark_sumstats/chr_$CHROM" \
+      --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
       --file-prefix "chr_$CHROM" \
@@ -57,7 +57,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --output-dir data/benchmark_results/e_step/new_viprs/ \
       --model all \
       --ld-panel "data/ld/eur/converted/ukbb_50k_windowed/int8/chr_$CHROM" \
-      --sumstats "data/sumstats/benchmark_sumstats/chr_$CHROM" \
+      --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
       --file-prefix "chr_$CHROM"
@@ -68,7 +68,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --output-dir data/benchmark_results/e_step/new_viprs/ \
       --model all \
       --ld-panel "data/ld/eur/converted/ukbb_50k_windowed/int8/chr_$CHROM" \
-      --sumstats "data/sumstats/benchmark_sumstats/chr_$CHROM" \
+      --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
       --file-prefix "chr_$CHROM" \
@@ -80,7 +80,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --output-dir data/benchmark_results/e_step/new_viprs/ \
       --model all \
       --ld-panel "data/ld/eur/converted/ukbb_50k_windowed/int8/chr_$CHROM" \
-      --sumstats "data/sumstats/benchmark_sumstats/chr_$CHROM" \
+      --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
       --file-prefix "chr_$CHROM" \

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "> Launching jobs for benchmarking the total runtime..."
+# Create logging directory:
+mkdir -p ./log/analysis/total_runtime_benchmarks/
+
 # Loop over the 5 training folds and launch the benchmarking jobs for
 # the new and old versions of VIPRS:
 

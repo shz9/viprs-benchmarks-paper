@@ -17,7 +17,7 @@ mkdir -p data/benchmark_results/total/
 
 # Call the benchmarking script:
 /usr/bin/time -v viprs_fit -l "data/ld/eur/old_format/ukbb_50k_windowed/chr_*/" \
-                          -s "data/sumstats/benchmark_sumstats/chr_*" \
+                          -s "data/sumstats/benchmark_sumstats/$cv_fold/chr_*.PHENO1.glm.linear" \
                           --output-file "data/model_fit/benchmarks/$cv_fold/old_viprs" \
                           --sumstats-format "plink" 2> "data/benchmark_results/total/old_viprs_fold_${cv_fold}.txt"
 

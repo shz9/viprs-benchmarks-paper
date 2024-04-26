@@ -1,0 +1,8 @@
+Resource,"Number of variants","Storage size (GB)","URL"
+SBayesR,1000000,10.3,""
+LDPred2,,,
+Lassosum,,,
+PRScs,,,
+VIPRS(v0.0.4),,,
+VIPRS(v0.1),,,
+PolyFun/LDstore,19465724,3118.64,s3://broad-alkesgroup-ukbb-ld/UKBB_LD/
