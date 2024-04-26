@@ -16,13 +16,22 @@ cv_fold=${1:-"fold_1"}
 # Activate the virtual environment:
 source env/viprs-old/bin/activate
 
-mkdir -p data/benchmark_results/total_runtime/
+mkdir -p "data/benchmark_results/total_runtime/$cv_fold/"
 
 # Call the benchmarking script:
 /usr/bin/time -v viprs_fit -l "data/ld/eur/old_format/ukbb_50k_windowed/chr_*/" \
-                          -s "data/sumstats/benchmark_sumstats/$cv_fold/chr_*.PHENO1.glm.linear" \
+                          -s "data/sumstats/benchmark_sumstats/train/$cv_fold/chr_*.PHENO1.glm.linear" \
                           --output-file "data/model_fit/benchmark_sumstats/$cv_fold/old_viprs" \
-                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/old_viprs_${cv_fold}.txt"
+                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/old_viprs.txt"
+
+# Perform evaluation using GWAS summary statistics from independent test set:
+deactivate
+source env/viprs/bin/activate
+
+python 1_analysis/total_runtime_benchmarks/sumstats_evaluate.py \
+        --fit-files "data/model_fit/benchmark_sumstats/$cv_fold/old_viprs*.fit*" \
+        --test-sumstats "data/sumstats/benchmark_sumstats/test/height_test_$cv_fold.csv.gz" \
+        --output-dir "data/benchmark_sumstats/prediction/$cv_fold/old_viprs.csv"
 
 # ------------------------------------------------------------
 echo "Job finished with exit code $? at: `date`"

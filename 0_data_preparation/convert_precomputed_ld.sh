@@ -7,15 +7,18 @@
 source env/viprs/bin/activate
 
 # Take the data type as an argument (with default set to int8):
-data_type=${1:-int8}
+data_type=("int8" "int16" "float32" "float64")
 
-for chrom in {1..22}
+for dtype in "${data_type[@]}"
 do
-  echo "Converting LD matrix for chromosome: $chrom..."
-  python3 0_data_preparation/convert_old_ld_matrices.py \
-    --old-matrix-path "data/ld/eur/old_format/ukbb_50k_windowed/chr_$chrom/" \
-    --new-path "data/ld/eur/converted/ukbb_50k_windowed/$data_type/chr_$chrom/" \
-    --dtype "$data_type"
+  for chrom in {1..22}
+  do
+    echo "Converting LD matrix for chromosome: $chrom..."
+    python3 0_data_preparation/convert_old_ld_matrices.py \
+      --old-matrix-path "data/ld/eur/old_format/ukbb_50k_windowed/chr_$chrom/" \
+      --new-path "data/ld/eur/converted/ukbb_50k_windowed/$dtype/chr_$chrom/" \
+      --dtype "$dtype"
+  done
 done
 
 deactivate
