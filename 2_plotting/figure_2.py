@@ -189,7 +189,8 @@ def plot_panel_a(iargs):
     sns.barplot(data=df,
                 y='Resource',
                 x='NormalizedStorage',
-                color='skyblue')
+                hue='Resource',
+                palette={r: ['skyblue', 'salmon']['VIPRS(v0.1)' in r] for r in df['Resource'].unique()})
     plt.xlabel("Storage (GB) per 1m variants")
     plt.ylabel("LD Matrix Resource")
 

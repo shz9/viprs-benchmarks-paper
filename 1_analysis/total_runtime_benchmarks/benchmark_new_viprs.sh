@@ -2,7 +2,7 @@
 #SBATCH --account=def-sgravel
 #SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=2GB
-#SBATCH --time=00:15:00
+#SBATCH --time=00:45:00
 #SBATCH --output=./log/analysis/total_runtime_benchmarks/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
@@ -21,7 +21,7 @@ model_id="l${ld_dtype}_t${threads}_j${jobs}"
 # Activate the virtual environment:
 source env/viprs/bin/activate
 
-mkdir -p "data/benchmark_results/total_runtime/$cv_fold/"
+mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
 
 # Call the benchmarking script:
 /usr/bin/time -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype/chr_*/" \
@@ -34,10 +34,12 @@ mkdir -p "data/benchmark_results/total_runtime/$cv_fold/"
                           --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt"
 
 # Perform evaluation using GWAS summary statistics from independent test set:
+# Use float32 LD panel by default for evaluating the test set:
 python 1_analysis/total_runtime_benchmarks/sumstats_evaluate.py \
         --fit-files "data/model_fit/benchmark_sumstats/$cv_fold/new_viprs/$model_id*.fit*" \
+        --test-ld-panel "data/ld/eur/converted/ukbb_50k_windowed/float32/chr_*/" \
         --test-sumstats "data/sumstats/benchmark_sumstats/test/height_test_$cv_fold.csv.gz" \
-        --output-dir "data/benchmark_sumstats/prediction/$cv_fold/new_viprs/$model_id.csv"
+        --output-file "data/benchmark_results/prediction/$cv_fold/new_viprs/$model_id.csv"
 
 # ------------------------------------------------------------
 echo "Job finished with exit code $? at: `date`"
