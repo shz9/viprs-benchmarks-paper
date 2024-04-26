@@ -2,7 +2,7 @@
 #SBATCH --account=def-sgravel
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=8GB
-#SBATCH --time=02:00:00
+#SBATCH --time=05:00:00
 #SBATCH --output=./log/analysis/e_step_benchmarks/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
@@ -24,11 +24,11 @@ source env/viprs-old/bin/activate
 # Call the benchmarking script:
 python3 1_analysis/e_step_benchmarks/benchmark_e_step_old_viprs.py \
       --temp-dir temp \
-      --output-dir data/benchmark_results/old_viprs/ \
+      --output-dir data/benchmark_results/e_step/old_viprs/ \
       --ld-panel "data/ld/eur/old_format/ukbb_50k_windowed/chr_$CHROM" \
       --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
-      --file-prefix "chr_$CHROM"
+      --file-prefix "chr_${CHROM}_"
 
 # Deactivate the virtual environment:
 deactivate
@@ -48,7 +48,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
-      --file-prefix "chr_$CHROM" \
+      --file-prefix "chr_${CHROM}_" \
       --float-precision "float64"
 
 # Test with new LD format / update float precision to float32:
@@ -60,7 +60,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
-      --file-prefix "chr_$CHROM"
+      --file-prefix "chr_${CHROM}_"
 
 # Test with float precision float32 and low memory mode:
 python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
@@ -71,7 +71,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
-      --file-prefix "chr_$CHROM" \
+      --file-prefix "chr_${CHROM}_" \
       --low-memory
 
 # Test with float precision float32 and low memory mode + dequantize on the fly:
@@ -83,7 +83,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
-      --file-prefix "chr_$CHROM" \
+      --file-prefix "chr_${CHROM}_" \
       --low-memory \
       --dequantize-on-the-fly
 

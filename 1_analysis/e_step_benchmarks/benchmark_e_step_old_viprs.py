@@ -213,6 +213,8 @@ if __name__ == '__main__':
 
     # ======================= VIPRS Grid =======================
 
+    print("Timing: VIPRSGrid | Manual linalg | Cython")
+
     v = VIPRSGrid(gdl, grid)
     res = measure_e_step_performance(v,
                                      n_experiments=args.n_experiments_grid,

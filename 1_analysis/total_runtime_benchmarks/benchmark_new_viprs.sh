@@ -7,16 +7,23 @@
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
 
+echo "Job started at: `date`"
+echo "Job ID: $SLURM_JOBID"
+
 # Take the cross validation fold as an argument (default to `fold_1`):
 cv_fold=${1:-"fold_1"}
 
 # Activate the virtual environment:
-source env/viprs-old/bin/activate
+source env/viprs/bin/activate
 
-mkdir -p data/benchmark_results/total/
+mkdir -p data/benchmark_results/total_runtime/
 
 # Call the benchmarking script:
 /usr/bin/time -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/int8/chr_*/" \
                           -s "data/sumstats/benchmark_sumstats/$cv_fold/chr_*.PHENO1.glm.linear" \
-                          --output-file "data/model_fit/benchmarks/$cv_fold/new_viprs" \
-                          --sumstats-format "plink" 2> "data/benchmark_results/total/new_viprs_fold_${cv_fold}.txt"
+                          --output-dir "data/model_fit/benchmark_sumstats/$cv_fold/" \
+                          --output-file-prefix "new_" \
+                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/new_viprs_${cv_fold}.txt"
+
+# ------------------------------------------------------------
+echo "Job finished with exit code $? at: `date`"
