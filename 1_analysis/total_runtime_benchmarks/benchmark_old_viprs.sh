@@ -19,7 +19,8 @@ source env/viprs-old/bin/activate
 mkdir -p "data/benchmark_results/total_runtime/$cv_fold/"
 
 # Call the benchmarking script:
-/usr/bin/time -v viprs_fit -l "data/ld/eur/old_format/ukbb_50k_windowed/chr_*/" \
+/usr/bin/time -v python3 1_analysis/total_runtime_benchmarks/updated_viprs_fit_v004.py \
+                          -l "data/ld/eur/old_format/ukbb_50k_windowed/chr_*/" \
                           -s "data/sumstats/benchmark_sumstats/train/$cv_fold/chr_*.PHENO1.glm.linear" \
                           --output-file "data/model_fit/benchmark_sumstats/$cv_fold/old_viprs" \
                           --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/old_viprs.txt"

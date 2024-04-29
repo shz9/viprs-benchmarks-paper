@@ -24,11 +24,12 @@ source env/viprs/bin/activate
 
 mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
 
+# Parse optional parameters:
+extra_params=()
+
 # If low_mem, add an option --use-symmetric-ld:
 if [ "$low_mem" = "true" ]; then
-  low_mem_opt="--use-symmetric-ld"
-else
-  low_mem_opt=""
+  extra_params+=(--use-symmetric-ld)
 fi
 
 # Call the benchmarking script:
@@ -39,8 +40,8 @@ fi
                           --threads "$threads" \
                           --n-jobs "$jobs" \
                           --output-profiler-metrics \
-                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt" \
-                          "$low_mem_opt"
+                          --sumstats-format "plink" \
+                          "${extra_params[@]}" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt"
 
 # Perform evaluation using GWAS summary statistics from independent test set:
 # Use float32 LD panel by default for evaluating the test set:
