@@ -32,7 +32,7 @@ python 1_analysis/total_runtime_benchmarks/sumstats_evaluate.py \
         --fit-files "data/model_fit/benchmark_sumstats/$cv_fold/old_viprs*.fit*" \
         --test-ld-panel "data/ld/eur/converted/ukbb_50k_windowed/float32/chr_*/" \
         --test-sumstats "data/sumstats/benchmark_sumstats/test/height_test_$cv_fold.csv.gz" \
-        --output-dir "data/benchmark_results/prediction/$cv_fold/old_viprs.csv"
+        --output-file "data/benchmark_results/prediction/$cv_fold/old_viprs.csv"
 
 # ------------------------------------------------------------
 echo "Job finished with exit code $? at: `date`"

@@ -2,6 +2,7 @@ import argparse
 import glob
 import os.path as osp
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from magenpy.utils.system_utils import makedir
@@ -29,10 +30,20 @@ def extract_data_panel_b():
     # Extract total time metrics:
     total_stats = []
 
-    for f in glob.glob("data/benchmark_results/total_runtime/*viprs_fold_*.txt"):
-        total_perf = extract_performance_statistics(f)
-        total_perf['Model'] = model_versions["_".join(osp.basename(f).split('_')[:2])]
-        total_stats.append(total_perf)
+    total_files = [
+        "data/benchmark_results/total_runtime/fold_*/old_viprs.txt",
+        "data/benchmark_results/total_runtime/fold_*/new_viprs/lint8_t1_j1.txt"
+    ]
+
+    for pattern in total_files:
+        for f in glob.glob(pattern):
+            total_perf = extract_performance_statistics(f)
+            if 'new_viprs' in f:
+                total_perf['Model'] = model_versions['new_viprs']
+            else:
+                total_perf['Model'] = model_versions['old_viprs']
+
+            total_stats.append(total_perf)
 
     total_df = pd.DataFrame(total_stats)
 
@@ -42,7 +53,7 @@ def extract_data_panel_b():
     e_step_stats = []
 
     # Extract data for new viprs:
-    for f in glob.glob("data/benchmark_results/e_step/new_viprs/chr_*_modelALL_lmTrue_prfloat32_threads1.csv"):
+    for f in glob.glob("data/benchmark_results/e_step/new_viprs/chr_*_modelALL_lmTrue_dqFalse_prfloat32_threads1.csv"):
         df = pd.read_csv(f)
         df = df.loc[(df['Model'] == 'VIPRS') & (df['axpy_implementation'] == 'BLAS')]
         df['Model'] = model_versions[f.split('/')[3]]
@@ -83,7 +94,7 @@ def extract_data_panel_c(chrom=1):
 
     # First, let's extract metrics for base version that only changed data structures:
     data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_prfloat64_threads1.csv"
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat64_threads1.csv"
     )
 
     data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
@@ -96,7 +107,7 @@ def extract_data_panel_c(chrom=1):
 
     # Second, let's extract metrics for the version that changed the data layout and float precision:
     data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_prfloat32_threads1.csv"
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads1.csv"
     )
 
     data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
@@ -107,26 +118,13 @@ def extract_data_panel_c(chrom=1):
         'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
     })
 
-    # Third, let's extract metrics for the version that changed the data layout, float precision, and axpy implementation:
-    data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_prfloat32_threads1.csv"
-    )
-
-    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
-                                        (data_improv_df['axpy_implementation'] == 'BLAS')]
-
-    data.append({
-        'Change': 'BLAS Linear Algebra',
-        'Improvement':  mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
-    })
-
     # Fourth, extract data for the low_memory version:
     data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmTrue_prfloat32_threads1.csv"
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmTrue_dqFalse_prfloat32_threads1.csv"
     )
 
     data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
-                                        (data_improv_df['axpy_implementation'] == 'BLAS')]
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
 
     data.append({
         'Change': 'Low memory',
@@ -134,12 +132,13 @@ def extract_data_panel_c(chrom=1):
     })
 
     # Fifth, show improvement with multithreading (2 threads)
+
     data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_prfloat32_threads2.csv"
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads2.csv"
     )
 
     data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
-                                        (data_improv_df['axpy_implementation'] == 'BLAS')]
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
 
     data.append({
         'Change': 'Coordinate Ascent Threads: 2',
@@ -147,12 +146,13 @@ def extract_data_panel_c(chrom=1):
     })
 
     # Fifth, show improvement with multithreading (4 threads)
+
     data_improv_df = pd.read_csv(
-        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_prfloat32_threads4.csv"
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads4.csv"
     )
 
     data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
-                                        (data_improv_df['axpy_implementation'] == 'BLAS')]
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
 
     data.append({
         'Change': 'Coordinate Ascent Threads: 4',
@@ -167,7 +167,74 @@ def extract_data_panel_d():
     Plot panel D of Figure 2.
     :return: The extracted and pre-processed data for panel D
     """
-    pass
+
+    # Extract total runtime information for the new viprs:
+
+    new_viprs_files = glob.glob("data/benchmark_results/total_runtime/fold_*/new_viprs/lint8_t*_j*.txt")
+    old_viprs_files = glob.glob("data/benchmark_results/total_runtime/fold_*/old_viprs.txt")
+
+    old_viprs_data = []
+
+    for f in old_viprs_files:
+        stats = extract_performance_statistics(f)
+        old_viprs_data.append(stats['Wallclock_Time'])
+
+    mean_runtime_old = np.mean(old_viprs_data)
+
+    data = []
+
+    for f in new_viprs_files:
+
+        stats = extract_performance_statistics(f)
+
+        fname = osp.basename(f).replace('.txt', '')
+        stats['Threads'] = int(fname.split('_')[1].replace('t', ''))
+        stats['Jobs'] = int(fname.split('_')[2].replace('j', ''))
+
+        data.append({
+            'Threads': int(fname.split('_')[1].replace('t', '')),
+            'Processes': int(fname.split('_')[2].replace('j', '')),
+            'Improvement in Total Runtime': mean_runtime_old / stats['Wallclock_Time']
+        })
+
+    return pd.DataFrame(data)
+
+
+def extract_data_panel_e():
+    """
+
+    :return:
+    """
+
+    import ast
+
+    new_viprs_files = glob.glob("data/benchmark_results/prediction/fold_*/new_viprs/*_j1.csv")
+    old_viprs_files = glob.glob("data/benchmark_results/prediction/fold_*/old_viprs.csv")
+
+    data = []
+
+    for f in old_viprs_files + new_viprs_files:
+
+        df = pd.read_csv(f)
+
+        pred = {
+            'R-Squared': ast.literal_eval(df.pseudo_R2[0])[0]
+        }
+
+        if 'new_viprs' in f:
+            pred['Model'] = model_versions['new_viprs']
+
+            fname = osp.basename(f).replace('.txt', '')
+            pred['Threads'] = int(fname.split('_')[1].replace('t', ''))
+            pred['LD'] = fname.split('_')[0][1:]
+        else:
+            pred['Model'] = model_versions['old_viprs']
+            pred['Threads'] = 1
+            pred['LD'] = 'float64'
+
+        data.append(pred)
+
+    return pd.DataFrame(data)
 
 
 def plot_panel_a(iargs):
@@ -184,7 +251,7 @@ def plot_panel_a(iargs):
     # Sort the dataframe by normalized storage:
     df = df.sort_values('NormalizedStorage')
 
-    plt.figure(figsize=(4, 8))
+    plt.figure(figsize=(5, 8))
 
     sns.barplot(data=df,
                 y='Resource',
@@ -194,8 +261,8 @@ def plot_panel_a(iargs):
     plt.xlabel("Storage (GB) per 1m variants")
     plt.ylabel("LD Matrix Resource")
 
-    plt.savefig(osp.join(iargs.output_dir, f'panel_a.{iargs.extension}'),
-                bbox_inches='tight')
+    plt.savefig(osp.join(iargs.output_dir, f'panel_a.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
 
 
 def plot_panel_b(iargs):
@@ -240,6 +307,7 @@ def plot_panel_b(iargs):
 
     plt.tight_layout()
     plt.savefig(osp.join(iargs.output_dir, f'panel_b.{iargs.extension}'))
+    plt.close()
 
 
 def plot_panel_c(iargs):
@@ -259,10 +327,12 @@ def plot_panel_c(iargs):
     # Change the angle for the x-labels to 45 degrees:
     plt.xticks(rotation=45, ha='right')
 
-    plt.ylabel("Improvement over VIPRS v0.0.4")
+    plt.ylabel("Fold improvement over VIPRS v0.0.4")
     plt.xlabel("Optimization")
+    plt.title("Improvements in E-Step Runtime")
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_c.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
 
 
 def plot_panel_d(iargs):
@@ -270,7 +340,49 @@ def plot_panel_d(iargs):
     Plot panel D of Figure 2.
     :param iargs: The commandline arguments captured by the argparse parser.
     """
-    pass
+
+    df = extract_data_panel_d()
+
+    # Generate a grouped barplot that shows the improvement in total runtime
+    # for difference processes (x-axis) and number of threads (`hue`):
+
+    sns.barplot(x='Processes', y='Improvement in Total Runtime',
+                hue='Threads', data=df,
+                palette={1: '#FFB2A8', 2: '#FF99A3', 4: '#FF8C7A'})
+
+    plt.xlabel("Processes")
+    plt.ylabel("Fold improvement over VIPRS v0.0.4")
+    plt.title("Improvement in Total Runtime with Parallelism")
+
+    plt.savefig(osp.join(iargs.output_dir, f'panel_d.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
+
+
+def plot_panel_e(iargs):
+    """
+    Plot panel E of Figure 2.
+    :param iargs:
+    :return:
+    """
+
+    df = extract_data_panel_e()
+
+    df_B = df[df['Model'] == 'v0.0.4']
+    sns.barplot(x='Model', y='R-Squared', data=df_B, color='skyblue')
+
+    # Create the grouped barplot
+    df_A = df[df['Model'] == 'v0.1']
+    sns.barplot(x='LD', y='R-Squared', hue='Threads', data=df_A,
+                palette={1: '#FFB2A8', 2: '#FF99A3', 4: '#FF8C7A'})
+
+    # Customize the plot
+    plt.xlabel('Model / LD Data Type')
+    plt.ylabel('Pseudo R-Squared')
+    plt.title('Prediction accuracy of VIPRS models on Standing Height')
+    plt.legend()
+
+    plt.savefig(osp.join(iargs.output_dir, f'panel_e.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
 
 
 if __name__ == '__main__':
@@ -294,4 +406,5 @@ if __name__ == '__main__':
     plot_panel_a(args)
     plot_panel_b(args)
     plot_panel_c(args)
-    #plot_panel_d(args)
+    plot_panel_d(args)
+    plot_panel_e(args)

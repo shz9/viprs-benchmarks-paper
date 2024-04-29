@@ -8,6 +8,7 @@ mkdir -p ./log/analysis/total_runtime_benchmarks/
 ld_dtype=("int8" "int16" "float32" "float64")
 threads=(1 2 4)
 jobs=(1 2 4)
+low_mem=("false" "true")
 
 # Loop over the 5 training folds and launch the benchmarking jobs for
 # the new and old versions of VIPRS:
@@ -22,8 +23,11 @@ do
     do
       for j in "${jobs[@]}"
       do
-        model_id="l${ld}_t${t}_j${j}"
-        sbatch -J "new_viprs_fold_${fold}_${model_id}" 1_analysis/total_runtime_benchmarks/benchmark_new_viprs.sh "fold_$fold" "$ld" "$t" "$j"
+        for m in "${low_mem[@]}"
+        do
+          model_id="l${ld}_m${m}_t${t}_j${j}"
+          sbatch -J "new_viprs_fold_${fold}_${model_id}" 1_analysis/total_runtime_benchmarks/benchmark_new_viprs.sh "fold_$fold" "$ld" "$t" "$j" "$m"
+        done
       done
     done
   done

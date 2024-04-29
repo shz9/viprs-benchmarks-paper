@@ -15,13 +15,21 @@ cv_fold=${1:-"fold_1"}
 ld_dtype=${2:-"int8"}
 threads=${3:-1}
 jobs=${4:-1}
+low_mem=${5:-"false"}
 
-model_id="l${ld_dtype}_t${threads}_j${jobs}"
+model_id="l${ld_dtype}_m${low_mem}_t${threads}_j${jobs}"
 
 # Activate the virtual environment:
 source env/viprs/bin/activate
 
 mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
+
+# If low_mem, add an option --use-symmetric-ld:
+if [ "$low_mem" = "true" ]; then
+  low_mem_opt="--use-symmetric-ld"
+else
+  low_mem_opt=""
+fi
 
 # Call the benchmarking script:
 /usr/bin/time -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype/chr_*/" \
@@ -31,7 +39,8 @@ mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
                           --threads "$threads" \
                           --n-jobs "$jobs" \
                           --output-profiler-metrics \
-                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt"
+                          --sumstats-format "plink" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt" \
+                          "$low_mem_opt"
 
 # Perform evaluation using GWAS summary statistics from independent test set:
 # Use float32 LD panel by default for evaluating the test set:
