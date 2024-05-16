@@ -16,11 +16,12 @@ ld_dtype=${2:-"int8"}
 threads=${3:-1}
 jobs=${4:-1}
 low_mem=${5:-"false"}
+dequantize=${6:-"false"}
 
-model_id="l${ld_dtype}_m${low_mem}_t${threads}_j${jobs}"
+model_id="l${ld_dtype}_m${low_mem}_q${dequantize}_t${threads}_j${jobs}"
 
 # Activate the virtual environment:
-source env/viprs/bin/activate
+source env/viprs2/bin/activate
 
 mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
 
@@ -28,12 +29,17 @@ mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
 extra_params=()
 
 # If low_mem, add an option --use-symmetric-ld:
-if [ "$low_mem" = "true" ]; then
+if [ "$low_mem" = "false" ]; then
   extra_params+=(--use-symmetric-ld)
 fi
 
+if [ "$dequantize" = "true" ]; then
+  extra_params+=(--dequantize-on-the-fly)
+fi
+
 # Call the benchmarking script:
-/usr/bin/time -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype/chr_*/" \
+/usr/bin/time -o "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt" \
+              -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype/chr_*/" \
                           -s "data/sumstats/benchmark_sumstats/train/$cv_fold/chr_*.PHENO1.glm.linear" \
                           --output-dir "data/model_fit/benchmark_sumstats/$cv_fold/new_viprs/" \
                           --output-file-prefix "$model_id" \
@@ -41,7 +47,7 @@ fi
                           --n-jobs "$jobs" \
                           --output-profiler-metrics \
                           --sumstats-format "plink" \
-                          "${extra_params[@]}" 2> "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt"
+                          "${extra_params[@]}"
 
 # Perform evaluation using GWAS summary statistics from independent test set:
 # Use float32 LD panel by default for evaluating the test set:

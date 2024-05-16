@@ -348,8 +348,6 @@ def main():
                 if p == 'sigma_beta' and args.sigma_beta_grid is None:
                     grid.generate_sigma_beta_grid(steps=args.sigma_beta_steps, h2=h2, n_snps=dl.n_snps)
 
-        # Record the amount of memory used before fitting the model:
-        mem_before = get_memory_usage()
         # Record time taken to load LD data:
         load_t0 = time.time()
         dl.load_ld()
@@ -456,12 +454,10 @@ def main():
                     raise e
 
         fit_t1 = time.time()
-        mem_after = get_memory_usage()
 
         # Record performance statistics:
         prof_metrics.append({
             'Chromosome': dl.chromosomes[0],
-            'Memory_usage_MB': mem_after - mem_before,
             'Load_time': round(load_t1 - load_t0, 2),
             'Fit_time': round(fit_t1 - load_t1, 2)
         })
