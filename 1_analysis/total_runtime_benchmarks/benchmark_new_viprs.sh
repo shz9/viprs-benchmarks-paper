@@ -10,6 +10,9 @@
 echo "Job started at: `date`"
 echo "Job ID: $SLURM_JOBID"
 
+# Exit on error:
+set -e
+
 # Take the cross validation fold as an argument (default to `fold_1`):
 cv_fold=${1:-"fold_1"}
 ld_dtype=${2:-"int8"}
@@ -37,10 +40,29 @@ if [ "$dequantize" = "true" ]; then
   extra_params+=(--dequantize-on-the-fly)
 fi
 
+echo "==================== Copy the input data to local storage ===================="
+# To minimize variation due to network latency, copy the input data to local storage:
+
+# Create temporary directory specific to this job:
+
+tmp_dir="$SLURM_TMPDIR/$SLURM_JOBID"
+mkdir -p "$tmp_dir"
+mkdir -p "$tmp_dir/ld"
+mkdir -p "$tmp_dir/sumstats"
+
+# Copy the LD data to tmp_dir:
+cp -r "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype" "$tmp_dir/ld"
+
+# Copy the summary statistics to tmp_dir:
+cp -r "data/sumstats/benchmark_sumstats/train/$cv_fold" "$tmp_dir/sumstats"
+
+
+echo "=========================== Model fit ==========================="
+
 # Call the benchmarking script:
 /usr/bin/time -o "data/benchmark_results/total_runtime/$cv_fold/new_viprs/$model_id.txt" \
-              -v viprs_fit -l "data/ld/eur/converted/ukbb_50k_windowed/$ld_dtype/chr_*/" \
-                          -s "data/sumstats/benchmark_sumstats/train/$cv_fold/chr_*.PHENO1.glm.linear" \
+              -v viprs_fit -l "$tmp_dir/ld/chr_*/" \
+                          -s "$tmp_dir/sumstats/chr_*.PHENO1.glm.linear" \
                           --output-dir "data/model_fit/benchmark_sumstats/$cv_fold/new_viprs/" \
                           --output-file-prefix "$model_id" \
                           --threads "$threads" \
@@ -48,6 +70,8 @@ fi
                           --output-profiler-metrics \
                           --sumstats-format "plink" \
                           "${extra_params[@]}"
+
+echo "=========================== Model Evaluation ==========================="
 
 # Perform evaluation using GWAS summary statistics from independent test set:
 # Use float32 LD panel by default for evaluating the test set:

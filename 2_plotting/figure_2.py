@@ -21,21 +21,24 @@ model_colors = {
 }
 
 
-def extract_total_runtime_stats(ld_datatype='int8', ld_mode='Triangular LD', threads=1, jobs=1):
+def extract_total_runtime_stats(ld_datatype='int8', ld_mode='Triangular LD', dequantize=False, threads=1, jobs=1):
 
     if ld_mode is None:
         ld_mode = '*'
-    elif ld_mode == 'Triangular LD':
-        ld_mode = 'mfalse'
     else:
-        ld_mode = 'mtrue'
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
+
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
 
     ld_datatype = ld_datatype or '*'
     threads = threads or '*'
     jobs = jobs or '*'
 
     total_files = [
-        f"data/benchmark_results/total_runtime/fold_*/new_viprs/l{ld_datatype}_{ld_mode}_t{threads}_j{jobs}.txt",
+        f"data/benchmark_results/total_runtime/fold_*/new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.txt",
         "data/benchmark_results/total_runtime/fold_*/old_viprs.txt",
     ]
 
@@ -48,34 +51,51 @@ def extract_total_runtime_stats(ld_datatype='int8', ld_mode='Triangular LD', thr
                 total_perf['Model'] = model_versions['new_viprs']
 
                 if 'mtrue' in f:
-                    total_perf['LD Mode'] = 'Symmetric LD'
-                else:
                     total_perf['LD Mode'] = 'Triangular LD'
+                else:
+                    total_perf['LD Mode'] = 'Symmetric LD'
+
+                total_perf['Dequantize'] = 'qtrue' in f
+                total_perf['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+
+                fname = osp.basename(f).replace('.txt', '')
+                total_perf['Processes'] = int(fname.split('_')[4].replace('j', ''))
+                total_perf['Threads'] = int(fname.split('_')[3].replace('t', ''))
+                total_perf['LD Data Type'] = fname.split('_')[0][1:]
+
 
             else:
                 total_perf['Model'] = model_versions['old_viprs']
                 total_perf['LD Mode'] = 'Symmetric LD'
+                total_perf['Dequantize'] = False
+                total_perf['Processes'] = 1
+                total_perf['Threads'] = 1
+                total_perf['LD Data Type'] = 'float64'
+                total_perf['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
 
             stats.append(total_perf)
 
     return pd.DataFrame(stats)
 
 
-def extract_accuracy_metrics(ld_datatype='int8', ld_mode='Triangular LD', threads=1, jobs=1):
+def extract_accuracy_metrics(ld_datatype='int8', ld_mode='Triangular LD', dequantize=False, threads=1, jobs=1):
 
     if ld_mode is None:
         ld_mode = '*'
-    elif ld_mode == 'Triangular LD':
-        ld_mode = 'mfalse'
     else:
-        ld_mode = 'mtrue'
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
+
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
 
     ld_datatype = ld_datatype or '*'
     threads = threads or '*'
     jobs = jobs or '*'
 
     pred_files = [
-        f"data/benchmark_results/prediction/fold_*/new_viprs/l{ld_datatype}_{ld_mode}_t{threads}_j{jobs}.csv",
+        f"data/benchmark_results/prediction/fold_*/new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.csv",
         "data/benchmark_results/prediction/fold_*/old_viprs.csv",
     ]
 
@@ -95,13 +115,26 @@ def extract_accuracy_metrics(ld_datatype='int8', ld_mode='Triangular LD', thread
                 pred['Model'] = model_versions['new_viprs']
 
                 if 'mtrue' in f:
-                    pred['LD Mode'] = 'Symmetric LD'
-                else:
                     pred['LD Mode'] = 'Triangular LD'
+                else:
+                    pred['LD Mode'] = 'Symmetric LD'
+
+                fname = osp.basename(f).replace('.csv', '')
+                pred['LD Data Type'] = fname.split('_')[0][1:]
+                pred['Processes'] = int(fname.split('_')[4].replace('j', ''))
+                pred['Threads'] = int(fname.split('_')[3].replace('t', ''))
+                pred['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+
+                pred['Dequantize'] = 'qtrue' in f
 
             else:
                 pred['Model'] = model_versions['old_viprs']
                 pred['LD Mode'] = 'Symmetric LD'
+                pred['Dequantize'] = False
+                pred['LD Data Type'] = 'float64'
+                pred['Processes'] = 1
+                pred['Threads'] = 1
+                pred['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
 
             preds.append(pred)
 
@@ -112,6 +145,7 @@ def extract_e_step_stats(chrom=None,
                          float_precision='float32',
                          threads=1,
                          ld_mode='Triangular LD',
+                         axpy_implementation='Manual',
                          dequantize=False,
                          model=None,
                          aggregate=True):
@@ -119,26 +153,23 @@ def extract_e_step_stats(chrom=None,
     chrom = chrom or '*'
     float_precision = float_precision or '*'
     threads = threads or '*'
+
     if dequantize is None:
         dequantize = '*'
 
     if ld_mode is None:
         ld_mode = '*'
-    elif ld_mode == 'Triangular LD':
-        ld_mode = 'lmTrue'
     else:
-        ld_mode = 'lmFalse'
+        ld_mode = ld_mode == 'Triangular LD'
 
     path = (f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_*_model"
-            f"ALL_{ld_mode}_dq{dequantize}_pr{float_precision}_threads{threads}.csv")
-
-    print(path)
+            f"ALL_lm{ld_mode}_dq{dequantize}_pr{float_precision}_threads{threads}.csv")
 
     e_step_stats = []
     # Extract data for new viprs:
     for f in glob.glob(path):
         df = pd.read_csv(f)
-        df = df.loc[df['axpy_implementation'] == 'Manual']
+        df = df.loc[df['axpy_implementation'] == axpy_implementation]
         if model is not None:
             df = df.loc[df['Model'] == model]
         df['ModelVersion'] = model_versions[f.split('/')[3]]
@@ -160,34 +191,6 @@ def extract_e_step_stats(chrom=None,
         ).reset_index()
 
     return e_step_df
-
-
-def extract_data_panel_b():
-    """
-    Extract and transform data for panel B of Figure 2.
-    :return: The extracted and pre-processed data for panel B
-    """
-
-    # --------------------------------------------------------
-    # Extract total time metrics:
-
-    total_df = extract_total_runtime_stats()
-
-    # --------------------------------------------------------
-    # Extract accuracy metrics:
-
-    preds = extract_accuracy_metrics()
-
-    # --------------------------------------------------------
-
-    # Extract E-Step time metrics:
-    e_step_df = extract_e_step_stats(model='VIPRS')
-
-    return {
-        'total_runtime': total_df,
-        'e_step': e_step_df,
-        'prediction': preds
-    }
 
 
 def extract_data_panel_c(chrom=1):
@@ -264,93 +267,29 @@ def extract_data_panel_c(chrom=1):
     return pd.DataFrame(data)
 
 
-def extract_data_panel_d():
-    """
-    Plot panel D of Figure 2.
-    :return: The extracted and pre-processed data for panel D
-    """
+def extract_profiler_data(ld_datatype='int8',
+                          ld_mode='Triangular LD',
+                          dequantize=False,
+                          threads=1,
+                          jobs=1,
+                          aggregate=True):
 
-    # Extract total runtime information for the new viprs:
+    if ld_mode is None:
+        ld_mode = '*'
+    else:
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
 
-    new_viprs_files = glob.glob("data/benchmark_results/total_runtime/fold_*/new_viprs/lint8_*.txt")
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
 
-    data = []
+    ld_datatype = ld_datatype or '*'
+    threads = threads or '*'
+    jobs = jobs or '*'
 
-    for f in new_viprs_files:
-
-        stats = extract_performance_statistics(f)
-
-        if 'mtrue' in f:
-            mode = 'Symmetric LD'
-        else:
-            mode = 'Triangular LD'
-
-        fname = osp.basename(f).replace('.txt', '')
-        threads = int(fname.split('_')[2].replace('t', ''))
-        jobs = int(fname.split('_')[3].replace('j', ''))
-
-        data.append({
-            'Threads': threads,
-            'Processes': jobs,
-            'LD Mode': mode,
-            'Wallclock Time (m)': stats['Wallclock_Time']
-        })
-
-    return pd.DataFrame(data)
-
-
-def extract_data_panel_e():
-    """
-
-    :return:
-    """
-
-    import ast
-
-    new_viprs_files = glob.glob("data/benchmark_results/prediction/fold_*/new_viprs/*_j1.csv")
-    old_viprs_files = glob.glob("data/benchmark_results/prediction/fold_*/old_viprs.csv")
-
-    data = []
-
-    for f in old_viprs_files + new_viprs_files:
-
-        df = pd.read_csv(f)
-
-        pred = {
-            'R-Squared': ast.literal_eval(df.pseudo_R2[0])[0]
-        }
-
-        if 'new_viprs' in f:
-            pred['Model'] = model_versions['new_viprs']
-
-            fname = osp.basename(f).replace('.txt', '')
-            pred['Threads'] = int(fname.split('_')[2].replace('t', ''))
-            pred['LD'] = fname.split('_')[0][1:]
-
-            if 'mtrue' in f:
-                pred['LD Mode'] = 'Symmetric LD'
-            else:
-                pred['LD Mode'] = 'Triangular LD'
-
-        else:
-            pred['Model'] = model_versions['old_viprs']
-            pred['Threads'] = 1
-            pred['LD'] = 'float64'
-            pred['LD Mode'] = 'Symmetric LD'
-
-        data.append(pred)
-
-    return pd.DataFrame(data)
-
-
-def extract_runtime_data():
-    """
-
-    :return:
-    """
-
-    new_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/new_viprs/*.time")
-    old_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/old_viprs.time")
+    new_viprs_files = glob.glob(f"data/model_fit/benchmark_sumstats/fold_*/new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}VIPRS*.prof")
+    old_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/old_viprs.prof")
 
     data = []
 
@@ -358,18 +297,28 @@ def extract_runtime_data():
 
         df = pd.read_csv(f, sep="\t")
 
+        if aggregate:
+            df = pd.DataFrame({
+                'Fit_time': [df['Fit_time'].sum()],
+                'Load_time': [df['Load_time'].sum()],
+                'Total_WallClockTime': [df['Total_WallClockTime'][0] / 60]
+            })
+
         if 'new_viprs' in f:
             df['Model'] = model_versions['new_viprs']
 
             fname = osp.basename(f).replace('.txt', '')
-            df['Threads'] = int(fname.split('_')[2].replace('t', ''))
+            df['Threads'] = int(fname.split('_')[3].replace('t', ''))
             df['LD Data Type'] = fname.split('_')[0][1:]
-            df['Processes'] = int(fname.split('_')[3].replace('j', '').replace('VIPRS', ''))
+            df['Processes'] = int(fname.split('_')[4].replace('j', '').replace('VIPRS', ''))
+            df['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
 
             if 'mtrue' in f:
-                df['LD Mode'] = 'Symmetric LD'
-            else:
                 df['LD Mode'] = 'Triangular LD'
+            else:
+                df['LD Mode'] = 'Symmetric LD'
+
+            df['Dequantize'] = 'qtrue' in f
 
         else:
             df['Model'] = model_versions['old_viprs']
@@ -377,6 +326,8 @@ def extract_runtime_data():
             df['Processes'] = 1
             df['LD Mode'] = 'Symmetric LD'
             df['LD Data Type'] = 'float64'
+            df['Dequantize'] = False
+            df['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
 
         data.append(df)
 
@@ -384,55 +335,6 @@ def extract_runtime_data():
         raise Exception("Found no data for the benchmarking of the models.")
 
     return pd.concat(data)
-
-
-def extract_aggregate_runtime_data():
-    """
-
-    :return:
-    """
-
-    new_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/new_viprs/*.time")
-    old_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/old_viprs.time")
-
-    data = []
-
-    for f in old_viprs_files + new_viprs_files:
-
-        df = pd.read_csv(f, sep="\t")
-
-        stats = {
-            'Fit Time': df['Fit_time'].sum(),
-            'Load Time': df['Load_time'].sum(),
-            'Total Wallclock Time': df['Total_WallClockTime'][0]
-        }
-
-        if 'new_viprs' in f:
-            stats['Model'] = model_versions['new_viprs']
-
-            fname = osp.basename(f).replace('.txt', '')
-            stats['Threads'] = int(fname.split('_')[2].replace('t', ''))
-            stats['LD Data Type'] = fname.split('_')[0][1:]
-            stats['Processes'] = int(fname.split('_')[3].replace('j', '').replace('VIPRS', ''))
-
-            if 'mtrue' in f:
-                stats['LD Mode'] = 'Symmetric LD'
-            else:
-                stats['LD Mode'] = 'Triangular LD'
-
-        else:
-            stats['Model'] = model_versions['old_viprs']
-            stats['Threads'] = 1
-            stats['Processes'] = 1
-            stats['LD Mode'] = 'Symmetric LD'
-            stats['LD Data Type'] = 'float64'
-
-        data.append(stats)
-
-    if len(data) < 1:
-        raise Exception("Found no data for the benchmarking of the models.")
-
-    return pd.DataFrame(data)
 
 
 def plot_panel_a(iargs):
@@ -451,34 +353,23 @@ def plot_panel_a(iargs):
 
     plt.figure(figsize=(5, 8))
 
+    colormap = {}
+    for r in df['Resource'].unique():
+        if 'VIPRS' in r:
+            colormap[r] = ['skyblue', 'salmon']['VIPRS(v0.1)' in r]
+        else:
+            colormap[r] = 'lightgray'
+
     ax = sns.barplot(data=df,
                      y='Resource',
                      x='NormalizedStorage',
                      hue='Resource',
-                     palette={r: ['skyblue', 'salmon']['VIPRS(v0.1)' in r] for r in df['Resource'].unique()})
+                     palette=colormap)
     add_labels_to_bars(ax, rotation=0., orientation='horizontal', units='GB')
     plt.xlabel("Storage (GB) per 1m variants")
     plt.ylabel("LD Matrix Resource")
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_1.{iargs.extension}'), bbox_inches="tight")
-    plt.close()
-
-    plt.figure(figsize=(5, 8))
-
-    df = extract_aggregate_runtime_data()
-
-    mean_old = df.loc[df.Model == 'v0.0.4', 'Load Time'].mean()
-
-    new_df = df.loc[df.Model == 'v0.1']
-    sns.catplot(data=new_df, x='LD Mode', y='Load Time', hue='LD Data Type', kind='bar',
-                order=['Triangular LD', 'Symmetric LD'],
-                hue_order=['float64', 'float32', 'int16', 'int8'],
-                palette='Paired')
-
-    plt.axhline(mean_old, c='grey', label='v0.0.4 Load Time', ls='--')
-    plt.ylabel("LD Matrix Load Time (s)")
-
-    plt.savefig(osp.join(iargs.output_dir, f'panel_a_2.{iargs.extension}'), bbox_inches="tight")
     plt.close()
 
 
@@ -488,11 +379,13 @@ def plot_panel_b(iargs):
     :param iargs: The commandline arguments captured by the argparse parser.
     """
 
-    timing_data = extract_data_panel_b()
+    prof_data = extract_profiler_data(aggregate=True)
+    prediction = extract_accuracy_metrics()
+    e_step = extract_e_step_stats(model='VIPRS')
+    total_runtime = extract_total_runtime_stats()
 
     # Save the figure data:
-    timing_data['total_runtime'].to_csv(osp.join(iargs.output_dir, 'figure_data', 'total_runtime.csv'), index=False)
-    timing_data['e_step'].to_csv(osp.join(iargs.output_dir, 'figure_data', 'e_step.csv'), index=False)
+    prof_data.to_csv(osp.join(iargs.output_dir, 'figure_data', 'profiler_data.csv'), index=False)
 
     fig = plt.figure(figsize=(9, 6))
     gs = gridspec.GridSpec(2, 3, figure=fig, height_ratios=[1, 1], width_ratios=[1, 1, 1])
@@ -503,30 +396,33 @@ def plot_panel_b(iargs):
     ax4 = plt.subplot(gs[1, :])
 
     # Plot the total time:
-    sns.barplot(x='Model', y='Wallclock_Time',
-                data=timing_data['total_runtime'], ax=ax1,
+    sns.barplot(x='Model', y='Total_WallClockTime',
+                data=prof_data,
+                ax=ax1,
                 hue='Model',
                 order=['v0.0.4', 'v0.1'],
                 palette=model_colors,
                 legend=False)
     ax1.set_xlabel(None)
     ax1.set_ylabel(None)
-    ax1.set_title('Wallclock Time (m)')
+    ax1.set_yticks(np.arange(0, 10, 2))
+    ax1.set_title('Wallclock Time (m)', pad=10)
 
     # Plot the peak memory:
     sns.barplot(x='Model', y='Peak_Memory_GB',
-                data=timing_data['total_runtime'], ax=ax2,
+                data=total_runtime, ax=ax2,
                 hue='Model',
                 order=['v0.0.4', 'v0.1'],
                 palette=model_colors,
                 legend=False)
     ax2.set_xlabel(None)
     ax2.set_ylabel(None)
-    ax2.set_title('Peak Memory (GB)')
+    ax2.set_yticks(np.arange(0, 3., .5))
+    ax2.set_title('Peak Memory (GB)', pad=10)
 
     # Plot prediction accuracy:
     sns.barplot(x='Model', y='R-Squared',
-                data=timing_data['prediction'],
+                data=prediction,
                 ax=ax3,
                 hue='Model',
                 order=['v0.0.4', 'v0.1'],
@@ -534,11 +430,13 @@ def plot_panel_b(iargs):
                 legend=False)
     ax3.set_xlabel(None)
     ax3.set_ylabel(None)
-    ax3.set_title('Prediction R-Squared')
+    ax3.set_yticks(np.arange(0, 0.35, 0.05))
+    ax3.set_title('Prediction R-Squared', pad=10)
 
     # Plot the avg time per E-Step and per chromosome:
     sns.lineplot(x='n_snps', y='TimePerIteration',
-                 hue='ModelVersion', data=timing_data['e_step'],
+                 hue='ModelVersion',
+                 data=e_step,
                  ax=ax4,
                  linewidth=3,
                  legend=False,
@@ -546,7 +444,7 @@ def plot_panel_b(iargs):
                  markersize=7,
                  palette=model_colors)
     ax4.set_yscale('log')
-    ax4.set_xlabel('Number of variants')
+    ax4.set_xlabel('Variants per Chromosome')
     ax4.set_ylabel('Time per Iteration (s)')
 
     plt.tight_layout()
@@ -598,22 +496,22 @@ def plot_panel_d(iargs):
                  marker='o',
                  markersize=7)
     plt.ylabel("Time per Iteration (s)")
-    plt.xlabel("Number of variants")
+    plt.xlabel("Variants per Chromosome")
     plt.title("Multithreading across SNPs:\nRuntime improvements with Parallel Coordinate Ascent")
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_d_1.{iargs.extension}'), bbox_inches="tight")
     plt.close()
 
-    df = extract_data_panel_d()
-    df = df.loc[(df['LD Mode'] == 'Triangular LD')]
+    df = extract_profiler_data(threads=1, jobs=None)
+    df = df.loc[df['Model'] == 'v0.1']
+
+    df.to_csv(osp.join(iargs.output_dir, 'figure_data', 'panel_d_processes.csv'), index=False)
 
     # Generate a grouped barplot that shows the improvement in total runtime
     # for difference processes (x-axis) and number of threads (`hue`):
     plt.figure(figsize=(8.5, 5))
-    sns.barplot(x='Processes', y='Wallclock Time (m)',
-                hue='Threads',
-                data=df)
-
+    sns.barplot(x='Processes', y='Total_WallClockTime', data=df, color='salmon')
+    plt.ylabel("Wallclock Time (m)")
     plt.xlabel("Processes")
     plt.title("Parallelism across Chromosomes")
 
@@ -628,13 +526,13 @@ def plot_panel_e(iargs):
     :return:
     """
 
-    df = extract_data_panel_e()
+    df = extract_accuracy_metrics(ld_datatype=None, ld_mode=None, threads=None)
 
     mean_acc_old = df[df['Model'] == 'v0.0.4']['R-Squared'].mean()
 
     # Create the grouped barplot
     df_new = df[df['Model'] == 'v0.1']
-    g = sns.catplot(kind='bar', x='LD', y='R-Squared', hue='Threads', data=df_new,
+    g = sns.catplot(kind='bar', x='LD Data Type', y='R-Squared', hue='Threads', data=df_new,
                     col='LD Mode',
                     palette={1: '#FFB2A8', 2: '#FF99A3', 4: '#FF8C7A'})
 
@@ -655,37 +553,81 @@ def plot_panel_e(iargs):
 
 def plot_ld_mode_panel(iargs):
 
-    total_df = extract_total_runtime_stats(ld_mode=None)
+    prof_df_no_dequantize = extract_profiler_data(ld_datatype=None, ld_mode=None, dequantize=False)
+    prof_df_no_dequantize['LD Mode'] = prof_df_no_dequantize['LD Mode'].str.replace(' LD', '')
+    prof_df_dequantize = extract_profiler_data(ld_datatype=None, ld_mode=None, dequantize=True)
+    prof_df_dequantize['LD Mode'] = prof_df_dequantize['LD Mode'].str.replace(' LD', '')
+    prof_df_dequantize['LD Mode'] += '+DQF'
+    prof_df = pd.concat([prof_df_no_dequantize, prof_df_dequantize])
+
+    mean_load_time_old_viprs = prof_df.loc[prof_df.Model == 'v0.0.4', 'Load_time'].mean()
+
+    total_df_no_dequantize = extract_total_runtime_stats(ld_mode=None, dequantize=False)
+    total_df_no_dequantize['LD Mode'] = total_df_no_dequantize['LD Mode'].str.replace(' LD', '')
+    total_df_dequantize = extract_total_runtime_stats(ld_mode=None, dequantize=True)
+    total_df_dequantize['LD Mode'] = total_df_dequantize['LD Mode'].str.replace(' LD', '')
+    total_df_dequantize['LD Mode'] += '+DQF'
+    total_df = pd.concat([total_df_no_dequantize, total_df_dequantize])
+
+    e_step_df_no_dequantize = extract_e_step_stats(ld_mode=None, chrom=1, model='VIPRS',
+                                                   threads=None, aggregate=False, dequantize=False)
+    e_step_df_no_dequantize['LD Mode'] = e_step_df_no_dequantize['Low_memory'].map(
+        {True: 'Triangular', False: 'Symmetric'}
+    )
+    e_step_df_dequantize = extract_e_step_stats(ld_mode=None, chrom=1, model='VIPRS',
+                                                threads=None, aggregate=False, dequantize=True)
+    e_step_df_dequantize['LD Mode'] = e_step_df_dequantize['Low_memory'].map(
+        {True: 'Triangular+DQF', False: 'Symmetric+DQF'}
+    )
+    e_step_df = pd.concat([e_step_df_no_dequantize, e_step_df_dequantize])
+
     total_df = total_df.loc[total_df.Model == 'v0.1']
-    total_df['LD Mode'] = total_df['LD Mode'].str.replace(' LD', '')
-    e_step_df = extract_e_step_stats(ld_mode=None, chrom=1, model='VIPRS', threads=None, aggregate=False)
+    prof_df = prof_df.loc[prof_df.Model == 'v0.1']
     e_step_df = e_step_df.loc[e_step_df.ModelVersion == 'v0.1']
 
-    fig, axs = plt.subplots(ncols=3, figsize=(12, 6))
-
-    # Plot the total time:
-    sns.barplot(x='LD Mode', y='Wallclock_Time',
-                data=total_df, ax=axs[0],
-                hue='LD Mode',
-                palette='Set2',
-                legend=False)
-    axs[0].set_ylabel('Wallclock Time (m)')
+    fig, axs = plt.subplots(ncols=4, figsize=(14, 6))
 
     # Plot the peak memory:
     sns.barplot(x='LD Mode', y='Peak_Memory_GB',
-                data=total_df, ax=axs[1],
+                data=total_df,
+                ax=axs[0],
                 hue='LD Mode',
+                order=sorted(total_df['LD Mode'].unique()),
                 palette='Set2',
                 legend=False)
-    axs[1].set_ylabel('Peak Memory (GB)')
+    axs[0].set_ylabel('Peak Memory (GB)')
+    axs[0].set_xticklabels(axs[0].get_xticklabels(), rotation=90)
 
-    sns.barplot(x='Low_memory', y='TimePerIteration',
-                order=[True, False],
-                legend=False,
-                hue='Threads', data=e_step_df, ax=axs[2])
-    axs[2].set_ylabel('Avg Time per E-Step(s)')
-    axs[2].set_xlabel('LD Mode')
-    axs[2].set_xticklabels(['Triangular', 'Symmetric'])
+    # Plot the total time:
+    sns.barplot(x='LD Mode', y='Total_WallClockTime',
+                data=prof_df.loc[prof_df['LD Data Type'] == 'int8'],
+                ax=axs[1],
+                hue='LD Mode',
+                order=sorted(prof_df['LD Mode'].unique()),
+                palette='Set2',
+                legend=False)
+    axs[1].set_ylabel('Wallclock Time (m)')
+    # Rotate the x-axis tick labels:
+    axs[1].set_xticklabels(axs[1].get_xticklabels(), rotation=90)
+
+    sns.barplot(x='LD Mode', y='TimePerIteration',
+                order=sorted(e_step_df['LD Mode'].unique()),
+                hue='Threads',
+                data=e_step_df,
+                ax=axs[2])
+    axs[2].set_ylabel('Time per Iteration (s)')
+    axs[2].set_xticklabels(axs[2].get_xticklabels(), rotation=90)
+    axs[2].legend(title='Threads', prop={'size': 8}, title_fontsize=10)
+
+    sns.barplot(data=prof_df, x='LD Mode', y='Load_time', hue='LD Data Type',
+                ax=axs[3],
+                order=sorted(prof_df['LD Mode'].unique()),
+                hue_order=['float64', 'float32', 'int16', 'int8'],
+                palette='Paired')
+    axs[3].axhline(mean_load_time_old_viprs, c='grey', label='v0.0.4 Load Time', ls='--')
+    axs[3].set_xticklabels(axs[3].get_xticklabels(), rotation=90)
+    axs[3].set_ylabel("LD Matrix Load Time (s)")
+    axs[3].legend(prop={'size': 8})
 
     plt.tight_layout()
     plt.savefig(osp.join(iargs.output_dir, f'panel_ld_mode.{iargs.extension}'))
@@ -712,8 +654,7 @@ if __name__ == '__main__':
 
     plot_panel_a(args)
     plot_panel_b(args)
-    plot_panel_c(args)
+    #plot_panel_c(args)
     plot_panel_d(args)
-    plot_panel_e(args)
+    #plot_panel_e(args)
     plot_ld_mode_panel(args)
-    #plot_panel_f(args)

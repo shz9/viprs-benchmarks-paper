@@ -516,7 +516,7 @@ def main():
     if len(prof_metrics) > 0:
         prof_df = pd.DataFrame(prof_metrics)
         prof_df['Total_WallClockTime'] = round(total_end_time - total_start_time, 2)
-        prof_df.to_csv(args.output_file + '.time', sep="\t", index=False)
+        prof_df.to_csv(args.output_file + '.prof', sep="\t", index=False)
 
 
 if __name__ == '__main__':
