@@ -29,10 +29,10 @@ mkdir -p "$tmp_dir/ld"
 mkdir -p "$tmp_dir/sumstats"
 
 # Copy the LD data to tmp_dir:
-cp -r "data/ld/eur/old_format/ukbb_50k_windowed" "$tmp_dir/ld"
+cp -r "data/ld/eur/old_format/ukbb_50k_windowed/"* "$tmp_dir/ld/"
 
 # Copy the summary statistics to tmp_dir:
-cp -r "data/sumstats/benchmark_sumstats/train/$cv_fold" "$tmp_dir/sumstats"
+cp -r "data/sumstats/benchmark_sumstats/train/$cv_fold/"* "$tmp_dir/sumstats/"
 
 
 echo "=========================== Model fit ==========================="

@@ -1,5 +1,10 @@
 import re
+import pandas as pd
 import numpy as np
+import glob
+import os.path as osp
+
+
 
 
 def extract_performance_statistics(time_file):
@@ -136,3 +141,341 @@ def add_labels_to_bars(g, rotation=90, fontsize='smaller', units=None, orientati
                     rotation=rotation,
                     ha=ha,
                     va=va)
+
+
+model_versions = {
+    'old_viprs': 'v0.0.4',
+    'new_viprs': 'v0.1'
+}
+
+model_colors = {
+    'v0.0.4': 'skyblue',
+    'v0.1': 'salmon'
+}
+
+
+def extract_total_runtime_stats(ld_datatype='int8',
+                                ld_mode='Triangular LD',
+                                dequantize=False,
+                                threads=1,
+                                jobs=1):
+
+    if ld_mode is None:
+        ld_mode = '*'
+    else:
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
+
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
+
+    ld_datatype = ld_datatype or '*'
+    threads = threads or '*'
+    jobs = jobs or '*'
+
+    total_files = [
+        f"data/benchmark_results/total_runtime/fold_*/"
+        f"new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.txt",
+        "data/benchmark_results/total_runtime/fold_*/old_viprs.txt",
+    ]
+
+    stats = []
+
+    for pattern in total_files:
+        for f in glob.glob(pattern):
+            total_perf = extract_performance_statistics(f)
+            if 'new_viprs' in f:
+                total_perf['Model'] = model_versions['new_viprs']
+
+                if 'mtrue' in f:
+                    total_perf['LD Mode'] = 'Triangular LD'
+                else:
+                    total_perf['LD Mode'] = 'Symmetric LD'
+
+                total_perf['Dequantize'] = 'qtrue' in f
+                total_perf['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+
+                fname = osp.basename(f).replace('.txt', '')
+                total_perf['Processes'] = int(fname.split('_')[4].replace('j', ''))
+                total_perf['Threads'] = int(fname.split('_')[3].replace('t', ''))
+                total_perf['LD Data Type'] = fname.split('_')[0][1:]
+
+
+            else:
+                total_perf['Model'] = model_versions['old_viprs']
+                total_perf['LD Mode'] = 'Symmetric LD'
+                total_perf['Dequantize'] = False
+                total_perf['Processes'] = 1
+                total_perf['Threads'] = 1
+                total_perf['LD Data Type'] = 'float64'
+                total_perf['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
+
+            stats.append(total_perf)
+
+    return pd.DataFrame(stats)
+
+
+def extract_accuracy_metrics(ld_datatype='int8',
+                             ld_mode='Triangular LD',
+                             dequantize=False,
+                             threads=1,
+                             jobs=1):
+
+    if ld_mode is None:
+        ld_mode = '*'
+    else:
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
+
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
+
+    ld_datatype = ld_datatype or '*'
+    threads = threads or '*'
+    jobs = jobs or '*'
+
+    pred_files = [
+        f"data/benchmark_results/prediction/fold_*/new_viprs/"
+        f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.csv",
+        "data/benchmark_results/prediction/fold_*/old_viprs.csv",
+    ]
+
+    preds = []
+
+    import ast
+
+    for pattern in pred_files:
+        for f in glob.glob(pattern):
+            df = pd.read_csv(f)
+
+            pred = {
+                'R-Squared': ast.literal_eval(df.pseudo_R2[0])[0]
+            }
+
+            if 'new_viprs' in f:
+                pred['Model'] = model_versions['new_viprs']
+
+                if 'mtrue' in f:
+                    pred['LD Mode'] = 'Triangular LD'
+                else:
+                    pred['LD Mode'] = 'Symmetric LD'
+
+                fname = osp.basename(f).replace('.csv', '')
+                pred['LD Data Type'] = fname.split('_')[0][1:]
+                pred['Processes'] = int(fname.split('_')[4].replace('j', ''))
+                pred['Threads'] = int(fname.split('_')[3].replace('t', ''))
+                pred['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+
+                pred['Dequantize'] = 'qtrue' in f
+
+            else:
+                pred['Model'] = model_versions['old_viprs']
+                pred['LD Mode'] = 'Symmetric LD'
+                pred['Dequantize'] = False
+                pred['LD Data Type'] = 'float64'
+                pred['Processes'] = 1
+                pred['Threads'] = 1
+                pred['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
+
+            preds.append(pred)
+
+    return pd.DataFrame(preds)
+
+
+def extract_e_step_stats(chrom=None,
+                         float_precision='float32',
+                         threads=1,
+                         ld_mode='Triangular LD',
+                         axpy_implementation='Manual',
+                         dequantize=False,
+                         model=None,
+                         aggregate=True):
+
+    chrom = chrom or '*'
+    float_precision = float_precision or '*'
+    threads = threads or '*'
+
+    if dequantize is None:
+        dequantize = '*'
+
+    if ld_mode is None:
+        ld_mode = '*'
+    else:
+        ld_mode = ld_mode == 'Triangular LD'
+
+    path = (f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_*_model"
+            f"ALL_lm{ld_mode}_dq{dequantize}_pr{float_precision}_threads{threads}.csv")
+
+    e_step_stats = []
+    # Extract data for new viprs:
+    for f in glob.glob(path):
+        df = pd.read_csv(f)
+        df = df.loc[df['axpy_implementation'] == axpy_implementation]
+        if model is not None:
+            df = df.loc[df['Model'] == model]
+        df['ModelVersion'] = model_versions[f.split('/')[3]]
+        e_step_stats.append(df)
+
+    # Extract data for old viprs:
+    for f in glob.glob(f"data/benchmark_results/e_step/old_viprs/chr_{chrom}_*.csv"):
+        df = pd.read_csv(f)
+        if model is not None:
+            df = df.loc[df['Model'] == model]
+        df['ModelVersion'] = model_versions[f.split('/')[3]]
+        e_step_stats.append(df)
+
+    e_step_df = pd.concat(e_step_stats)
+
+    if aggregate:
+        e_step_df = e_step_df.groupby(['Model', 'ModelVersion', 'Chromosome', 'n_snps']).agg(
+            {'TimePerIteration': 'mean'}
+        ).reset_index()
+
+    return e_step_df
+
+
+def extract_relative_improvement_data(chrom=1):
+    """
+    Plot panel C of Figure 2.
+    :return: The extracted and pre-processed data for panel C
+    """
+
+    # Extract E-Step performance metrics for old viprs:
+    old_viprs_df = pd.read_csv(f"data/benchmark_results/e_step/old_viprs/chr_{chrom}_timing_results.csv")
+    old_viprs_df = old_viprs_df.loc[(old_viprs_df['Model'] == 'VIPRS')]
+    # Extract our reference runtime:
+    mean_time_old_viprs = old_viprs_df['TimePerIteration'].median()
+
+    # --------------------------------------------------
+    # Extract E-Step performance metrics for new viprs:
+
+    data = []
+
+    # First, let's extract metrics for base version that only changed data structures:
+    data_improv_df = pd.read_csv(
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat64_threads1.csv"
+    )
+
+    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
+
+    data.append({
+        'Change': 'LD data layout',
+        'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
+    })
+
+    # Second, let's extract metrics for the version that changed the data layout and float precision:
+    data_improv_df = pd.read_csv(
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads1.csv"
+    )
+
+    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
+
+    data.append({
+        'Change': '+ Float precision: float32',
+        'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
+    })
+
+    # Fifth, show improvement with multithreading (2 threads)
+
+    data_improv_df = pd.read_csv(
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads2.csv"
+    )
+
+    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
+
+    data.append({
+        'Change': '+ Threads: 2',
+        'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
+    })
+
+    # Fifth, show improvement with multithreading (4 threads)
+
+    data_improv_df = pd.read_csv(
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads4.csv"
+    )
+
+    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
+
+    data.append({
+        'Change': '+ Threads: 4',
+        'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
+    })
+
+    return pd.DataFrame(data)
+
+
+def extract_profiler_data(ld_datatype='int8',
+                          ld_mode='Triangular LD',
+                          dequantize=False,
+                          threads=1,
+                          jobs=1,
+                          aggregate=True):
+
+    if ld_mode is None:
+        ld_mode = '*'
+    else:
+        ld_mode = str(ld_mode == 'Triangular LD').lower()
+
+    if dequantize is None:
+        dequantize = '*'
+    else:
+        dequantize = str(dequantize).lower()
+
+    ld_datatype = ld_datatype or '*'
+    threads = threads or '*'
+    jobs = jobs or '*'
+
+    new_viprs_files = glob.glob(f"data/model_fit/benchmark_sumstats/fold_*/new_viprs/"
+                                f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}VIPRS*.prof")
+    old_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/old_viprs.prof")
+
+    data = []
+
+    for f in old_viprs_files + new_viprs_files:
+
+        df = pd.read_csv(f, sep="\t")
+
+        if aggregate:
+            df = pd.DataFrame({
+                'Fit_time': [df['Fit_time'].sum()],
+                'Load_time': [df['Load_time'].sum()],
+                'Total_WallClockTime': [df['Total_WallClockTime'][0] / 60]
+            })
+
+        if 'new_viprs' in f:
+            df['Model'] = model_versions['new_viprs']
+
+            fname = osp.basename(f).replace('.txt', '')
+            df['Threads'] = int(fname.split('_')[3].replace('t', ''))
+            df['LD Data Type'] = fname.split('_')[0][1:]
+            df['Processes'] = int(fname.split('_')[4].replace('j', '').replace('VIPRS', ''))
+            df['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+
+            if 'mtrue' in f:
+                df['LD Mode'] = 'Triangular LD'
+            else:
+                df['LD Mode'] = 'Symmetric LD'
+
+            df['Dequantize'] = 'qtrue' in f
+
+        else:
+            df['Model'] = model_versions['old_viprs']
+            df['Threads'] = 1
+            df['Processes'] = 1
+            df['LD Mode'] = 'Symmetric LD'
+            df['LD Data Type'] = 'float64'
+            df['Dequantize'] = False
+            df['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
+
+        data.append(df)
+
+    if len(data) < 1:
+        raise Exception("Found no data for the benchmarking of the models.")
+
+    return pd.concat(data)
