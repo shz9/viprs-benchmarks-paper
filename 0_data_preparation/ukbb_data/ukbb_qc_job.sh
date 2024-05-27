@@ -2,8 +2,8 @@
 #SBATCH --account=def-sgravel
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=8GB
-#SBATCH --time=02:00:00
-#SBATCH --output=./log/data_preparation/%x/%j.out
+#SBATCH --time=08:00:00
+#SBATCH --output=./log/data_preparation/genotypes/%j.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
 
@@ -17,21 +17,19 @@ module load plink
 cd "$WORKING_DIR" || exit
 
 CHR=${1:-22}  # Chromosome number (default 22)
-snp_extract_file=${2-"data/keep_files/ukbb_qc_snps.keep"}
-ind_keep_file=${3-"data/keep_files/ukbb_qc_individuals.keep"}
+snp_extract_file=${2-"data/keep_files/hq_imputed_variants.txt"}
+ind_keep_file=${3-"data/keep_files/ukbb_qc_individuals_all.keep"}
 output_dir=${4-"data/ukbb_qc_genotypes"}
 
 mkdir -p "$output_dir"
 
-plink2 --bgen "$UKBB_GENOTYPE_DIR/ukb_imp_chr${CHR}_v3.bgen" ref-first \
-      --sample "$UKBB_GENOTYPE_DIR/ukb6728_imp_chr${CHR}_v3_s487395.sample" \
+plink2 --bgen "$UKBB_GENOTYPE_DIR/ukb22828_c${CHR}_b0_v3.bgen" ref-first \
+      --sample "$UKBB_GENOTYPE_DIR/ukb22828_c${CHR}_b0_v3.sample" \
       --make-bed \
       --allow-no-sex \
       --keep "$ind_keep_file" \
       --extract "$snp_extract_file" \
       --hwe "$HWE_CUTOFF" \
-      --mind "$MIND" \
-      --geno "$GENO" \
       --mac "$MIN_MAC" \
       --max-alleles 2 \
       --hard-call-threshold "$HARDCALL_THRES" \

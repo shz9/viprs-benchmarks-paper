@@ -8,11 +8,8 @@
 MIN_MAC=20
 
 # Missingness rate filters:
-MIND=0.05  # Maximum missingness rate for individuals
-GENO=0.05  # Maximum missingness rate for SNPs
-
-# Hardy-Weinberg Equilibrium test cutoff:
-HWE_CUTOFF=1e-10
+MIND=0.1  # Maximum missingness rate for individuals
+GENO=0.1  # Maximum missingness rate for SNPs
 
 # Hard call threshold:
 HARDCALL_THRES=0.1
@@ -25,12 +22,12 @@ WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # The path to the UKBB genotype data:
 # (See data_preparation/ukbb_qc_job.sh for how this path is used)
-UKBB_GENOTYPE_DIR="/lustre03/project/6004777/projects/uk_biobank/imputed_data/full_UKBB/v3_bgen12"
+UKBB_GENOTYPE_DIR="/lustre03/project/6008063/neurohub/UKB/Bulk/Imputation/UKB_imputation_from_genotype/"
 
 # The path to the UKBB phenotype data:
 # (See data_preparation/prepare_real_phenotypes.py for how this path is used)
-UKBB_PHENOTYPE_DIR="/lustre03/project/6004777/projects/uk_biobank/raw"
+UKBB_PHENOTYPE_DIR="/lustre03/project/6008063/neurohub/UKB/Tabular/"
 
 # The path to the 1000G genetic map:
 # (See data_preparation/ukbb_qc_job.sh for how this path is used)
-GENETIC_MAP_DIR="$HOME/projects/ctb-sgravel/data/genetic_maps/1000GP_Phase3"
+GENETIC_MAP_DIR="$HOME/projects/def-sgravel/data/genetic_maps/1000GP_Phase3"

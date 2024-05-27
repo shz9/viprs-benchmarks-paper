@@ -18,7 +18,7 @@ def plot_panel_a(iargs):
     df['NormalizedStorage'] = (df['Storage size (GB)'] / df['Number of variants'])*1e6
 
     # Sort the dataframe by normalized storage:
-    df = df.sort_values('NormalizedStorage')
+    df = df.sort_values('NormalizedStorage', ascending=False)
 
     plt.figure(figsize=(5, 8))
 
