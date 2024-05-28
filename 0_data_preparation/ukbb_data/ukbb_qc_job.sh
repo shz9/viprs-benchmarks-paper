@@ -29,7 +29,6 @@ plink2 --bgen "$UKBB_GENOTYPE_DIR/ukb22828_c${CHR}_b0_v3.bgen" ref-first \
       --allow-no-sex \
       --keep "$ind_keep_file" \
       --extract "$snp_extract_file" \
-      --hwe "$HWE_CUTOFF" \
       --mac "$MIN_MAC" \
       --max-alleles 2 \
       --hard-call-threshold "$HARDCALL_THRES" \
@@ -40,7 +39,7 @@ module load plink/1.9b_4.1-x86_64
 # Update the SNP cM position using the HapMap3 genetic map:
 plink --bfile "$output_dir/chr_${CHR}" \
       --cm-map "$GENETIC_MAP_DIR/genetic_map_chr@_combined_b37.txt" \
-      --make-bed \
+      --make-just-bim \
       --out "$output_dir/chr_${CHR}"
 
 rm -r "$output_dir"/*~

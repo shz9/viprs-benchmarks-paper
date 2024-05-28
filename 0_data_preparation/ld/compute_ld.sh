@@ -32,7 +32,7 @@ magenpy_ld \
     --backend plink \
     --estimator windowed \
     --ld-window-cm 3 \
-    --storage-dtype "float32" \
+    --storage-dtype "int8" \
     --genome-build "GRCh37" \
     --metadata "" \
     --output-dir ""
