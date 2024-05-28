@@ -2,7 +2,7 @@
 #SBATCH --account=def-sgravel
 #SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=8GB
-#SBATCH --time=2:00:00
+#SBATCH --time=60:00:00
 #SBATCH --output=./log/data_preparation/ld_mat/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
@@ -33,7 +33,7 @@ echo "> Extract file: $(basename $EXTRACTFILE)"
 SECONDS=0
 
 mkdir -p "$OUTPUTDIR"
-module load plink2
+module load plink
 
 magenpy_ld \
     --bfile "$BEDFILE" \
@@ -47,7 +47,7 @@ magenpy_ld \
     --compressor "zstd" \
     --compression-level 9 \
     --genome-build "GRCh37" \
-    --metadata "Biobank=UK Biobank,Ancestry=${POP},Date=$(date +%B%Y)" \
+    --metadata "Biobank=UK Biobank,Ancestry=${POP}" \
     --output-dir "$OUTPUTDIR"
 
 MINUTES=$(echo "scale=2; $SECONDS/60" | bc)
