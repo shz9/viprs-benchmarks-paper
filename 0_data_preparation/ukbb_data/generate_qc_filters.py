@@ -31,7 +31,8 @@ bridge_df = pd.read_csv("/lustre03/project/6008063/neurohub/UKB/Returns/2442/ukb
 ind_list = ind_list.merge(bridge_df).drop(columns=['s'])
 # Keep only unrelateds:
 ind_list = ind_list.loc[~ind_list.related]
-ind_list[['IID', 'IID']].to_csv("data/keep_files/ukbb_qc_individuals_all.keep", header=False, index=False)
+ind_list[['IID', 'IID']].to_csv("data/keep_files/ukbb_qc_individuals_all.keep",
+                                sep="\t", header=False, index=False)
 
 for pop in ind_list['pop'].unique():
 
@@ -39,7 +40,8 @@ for pop in ind_list['pop'].unique():
     print("Population:", pop, "| Number of individuals:", len(pop_df))
 
     pop_df.to_csv(
-        f"data/keep_files/ukbb_qc_individuals_{pop}.keep", header=False, index=False
+        f"data/keep_files/ukbb_qc_individuals_{pop}.keep", sep="\t",
+        header=False, index=False
     )
 
 del ind_list
@@ -109,7 +111,7 @@ cond = variant_df.MAF >= 0.001
 print("Number of variants with MAF >= 0.001:", cond.sum())
 
 variant_df.loc[cond][['SNP']].to_csv(
-    "data/keep_files/hq_imputed_variants_maf001.csv", index=False, header=False
+    "data/keep_files/hq_imputed_variants_maf001.txt", index=False, header=False
 )
 
 # Restrict to variants in "expanded HapMap3" set from Prive et al.:
@@ -118,5 +120,5 @@ merged_df = variant_df.merge(hm3_df, left_on='SNP', right_on='rsid')
 del variant_df, hm3_df
 print("Number of variants in HM3 set:", len(merged_df))
 merged_df[['SNP']].to_csv(
-    "data/keep_files/hq_imputed_variants_hm3.csv", index=False, header=False
+    "data/keep_files/hq_imputed_variants_hm3.txt", index=False, header=False
 )

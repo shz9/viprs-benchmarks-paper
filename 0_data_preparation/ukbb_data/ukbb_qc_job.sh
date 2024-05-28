@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=8GB
 #SBATCH --time=08:00:00
-#SBATCH --output=./log/data_preparation/genotypes/%j.out
+#SBATCH --output=./log/data_preparation/genotypes/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
 
