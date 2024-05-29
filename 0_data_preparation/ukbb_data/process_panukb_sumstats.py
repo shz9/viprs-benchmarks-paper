@@ -1,21 +1,15 @@
 import pandas as pd
 import glob
 import os
+from joblib import Parallel, delayed
 
-merged_df = pd.read_csv("data/sumstats/panukb_sumstats/subset_pheno_manifest.csv")
 
-# Process the sumstats:
-# Here, we read the sumstats files, apply some filters,
-# split them per population, and prepare them for PRS inference with VIPRS:
-
-merged_df['phenocode'] = merged_df['phenocode'].astype(str)
-
-for f in glob.glob("data/sumstats/panukb_sumstats/*.tsv.bgz"):
+def process_sumstats_file(f, pheno_df):
 
     print("> Extracting and processing:", f)
 
     phenocode = os.path.basename(f).split('-')[1]
-    sub_pheno_df = merged_df.loc[merged_df['phenocode'] == phenocode]
+    sub_pheno_df = pheno_df.loc[pheno_df['phenocode'] == phenocode]
 
     pops = sub_pheno_df['pop'].unique()
 
@@ -58,4 +52,20 @@ for f in glob.glob("data/sumstats/panukb_sumstats/*.tsv.bgz"):
         # Write the sumstats:
         os.system(f"mkdir -p data/sumstats/panukb_sumstats/{pop}/")
         out_df.to_csv(f"data/sumstats/panukb_sumstats/{pop}/{phenocode}.sumstats.gz",
-                      sep="\t", index=False)
+                      sep="\t", index=False, compression='gzip')
+
+
+if __name__ == '__main__':
+
+    pheno_df = pd.read_csv("data/sumstats/panukb_sumstats/subset_pheno_manifest.csv")
+
+    # Process the sumstats:
+    # Here, we read the sumstats files, apply some filters,
+    # split them per population, and prepare them for PRS inference with VIPRS:
+
+    pheno_df['phenocode'] = pheno_df['phenocode'].astype(str)
+
+    Parallel(n_jobs=5)(
+        delayed(process_sumstats_file)(f, pheno_df)
+        for f in glob.glob("data/sumstats/panukb_sumstats/*.tsv.bgz")
+    )

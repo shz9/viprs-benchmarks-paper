@@ -3,7 +3,7 @@
 pops=("AFR" "AMR" "CSA" "EAS" "EUR" "MID")
 
 declare -A time_dict
-time_dict["hq_imputed_variants_hm3"]="04:00:00"
+time_dict["hq_imputed_variants_hm3"]="02:00:00"
 time_dict["hq_imputed_variants_maf001"]="30:00:00"
 time_dict["hq_imputed_variants"]="80:00:00"
 
