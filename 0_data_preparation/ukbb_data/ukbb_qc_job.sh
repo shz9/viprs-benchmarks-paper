@@ -40,6 +40,7 @@ module load plink/1.9b_4.1-x86_64
 plink --bfile "$output_dir/chr_${CHR}" \
       --cm-map "$GENETIC_MAP_DIR/genetic_map_chr@_combined_b37.txt" \
       --make-just-bim \
+      --keep-allele-order \
       --out "$output_dir/chr_${CHR}"
 
 rm -r "$output_dir"/*~

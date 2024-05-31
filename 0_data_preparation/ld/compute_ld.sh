@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --account=def-sgravel
+#SBATCH --account=ctb-sgravel
 #SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=8GB
 #SBATCH --time=60:00:00
