@@ -32,9 +32,9 @@ do
       do
 
         # If jobs > 1, then only run threads = 1:
-        if [ "$j" -gt 1 ] && [ "$t" -gt 1 ]; then
-          continue
-        fi
+        #if [ "$j" -gt 1 ] && [ "$t" -gt 1 ]; then
+        #  continue
+        #fi
 
         for m in "${low_mem[@]}"
         do

@@ -8,9 +8,9 @@ time_dict["hq_imputed_variants_maf001"]="60:00:00"
 time_dict["hq_imputed_variants"]="80:00:00"
 
 declare -A mem_dict
-mem_dict["hq_imputed_variants_hm3"]="64GB"
-mem_dict["hq_imputed_variants_maf001"]="128GB"
-mem_dict["hq_imputed_variants"]="128GB"
+mem_dict["hq_imputed_variants_hm3"]="4GB"
+mem_dict["hq_imputed_variants_maf001"]="8GB"
+mem_dict["hq_imputed_variants"]="8GB"
 
 for var_set in data/keep_files/hq_imputed_variant*.txt
 do
@@ -29,7 +29,10 @@ do
     do
       echo "${VARIANT_SET} | ${pop} | chr_${chrom}"
       # Set the time for SLURM depending on the variant set:
-      sbatch --time "${time_dict[$VARIANT_SET]}" --mem "${mem_dict[$VARIANT_SET]}" -J "${VARIANT_SET}/${pop}/chr_${chrom}" 0_data_preparation/ld/compute_ld.sh "windowed" "data/ukbb_qc_genotypes/chr_${chrom}" "$pop" "data/keep_files/ukbb_qc_individuals_${pop}.keep" "$var_set"
+      sbatch --time "${time_dict[$VARIANT_SET]}" \
+             --mem-per-cpu "${mem_dict[$VARIANT_SET]}" \
+             -J "${VARIANT_SET}/${pop}/chr_${chrom}" \
+             0_data_preparation/ld/compute_ld.sh "windowed" "data/ukbb_qc_genotypes/chr_${chrom}" "$pop" "data/keep_files/ukbb_qc_individuals_${pop}.keep" "$var_set"
     done
   done
 done

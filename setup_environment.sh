@@ -13,7 +13,7 @@ echo "========================================================"
 echo "Setting up environment for newer version of viprs (v0.1)"
 
 module load StdEnv/2020
-module load python/3.8
+module load python/3.10
 python --version
 
 # Create environment with latest version of VIPRS:

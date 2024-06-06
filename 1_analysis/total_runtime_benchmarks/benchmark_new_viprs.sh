@@ -24,7 +24,7 @@ dequantize=${6:-"false"}
 model_id="l${ld_dtype}_m${low_mem}_q${dequantize}_t${threads}_j${jobs}"
 
 # Activate the virtual environment:
-source env/viprs2/bin/activate
+source env/viprs/bin/activate
 
 mkdir -p "data/benchmark_results/total_runtime/$cv_fold/new_viprs/"
 
