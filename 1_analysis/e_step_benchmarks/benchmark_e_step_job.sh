@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=def-sgravel
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=12
 #SBATCH --mem-per-cpu=2GB
 #SBATCH --time=05:00:00
 #SBATCH --output=./log/analysis/e_step_benchmarks/%x.out
@@ -48,6 +48,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/train/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
+      --threads "2,4,8" \
       --file-prefix "chr_${CHROM}_" \
       --float-precision "float64"
 
@@ -60,6 +61,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/train/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
+      --threads "2,4,8" \
       --file-prefix "chr_${CHROM}_"
 
 # Test with float precision float32 and low memory mode:
@@ -71,6 +73,7 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/train/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
+      --threads "2,4,8" \
       --file-prefix "chr_${CHROM}_" \
       --low-memory
 
@@ -83,9 +86,11 @@ python3 1_analysis/e_step_benchmarks/benchmark_e_step.py \
       --sumstats "data/sumstats/benchmark_sumstats/train/fold_1/chr_$CHROM.PHENO1.glm.linear" \
       --sumstats-format plink \
       --implementation cpp \
+      --threads "2,4,8" \
       --file-prefix "chr_${CHROM}_" \
       --low-memory \
       --dequantize-on-the-fly
 
 # ------------------------------------------------------------
 echo "Job finished with exit code $? at: `date`"
+

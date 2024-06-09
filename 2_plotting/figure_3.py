@@ -5,31 +5,6 @@ from magenpy.utils.system_utils import makedir
 from utils import *
 
 
-def plot_relative_improvement(iargs):
-    """
-    Plot panel C of Figure 2.
-    :param iargs: The commandline arguments captured by the argparse parser.
-    """
-
-    df = extract_relative_improvement_data()
-
-    # Save the figure data:
-    df.to_csv(osp.join(iargs.output_dir, 'figure_data', 'e_step_improvements.csv'), index=False)
-
-    plt.figure(figsize=(8, 5))
-    sns.barplot(x='Change', y='Improvement', data=df, color='salmon')
-
-    # Change the angle for the x-labels to 45 degrees:
-    plt.xticks(rotation=45, ha='right')
-
-    plt.ylabel("Median improvement over v0.0.4")
-    plt.xlabel("Incremental changes (left -> right)")
-    plt.title("Fold runtime improvements in Coordinate Ascent (E-Step)")
-
-    plt.savefig(osp.join(iargs.output_dir, f'rel_improv.{iargs.extension}'), bbox_inches="tight")
-    plt.close()
-
-
 def plot_panel_a(iargs):
     """
     Plot panel a of Figure 3.
@@ -39,7 +14,7 @@ def plot_panel_a(iargs):
     df = extract_e_step_stats(model='VIPRS', threads=None, aggregate=False)
     df = df.loc[df['ModelVersion'] == 'v0.1']
     df = df.groupby(['Model', 'ModelVersion', 'Chromosome', 'n_snps', 'Threads']).agg(
-        {'TimePerIteration': 'mean'}
+        {'TimePerIteration': 'median'}
     ).reset_index()
 
     plt.figure(figsize=(7.5, 5))
@@ -50,13 +25,13 @@ def plot_panel_a(iargs):
                  markersize=7)
     plt.ylabel("Time per Iteration (s)")
     plt.xlabel("Variants per Chromosome")
-    plt.title(r'$\bf{(a)}$' + "\nMultithreading across SNPs:\nRuntime improvements with Parallel Coordinate Ascent",
+    plt.title(r'$\bf{(a)}$' + "\nMulti-threading across variants",
               pad=10)
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_1.{iargs.extension}'), bbox_inches="tight")
     plt.close()
 
-    df = extract_profiler_data(threads=1, jobs=None)
+    df = extract_profiler_data(threads=None, jobs=None)
     df = df.loc[df['Model'] == 'v0.1']
 
     df.to_csv(osp.join(iargs.output_dir, 'figure_data', 'panel_d_processes.csv'), index=False)
@@ -64,10 +39,10 @@ def plot_panel_a(iargs):
     # Generate a grouped barplot that shows the improvement in total runtime
     # for difference processes (x-axis) and number of threads (`hue`):
     plt.figure(figsize=(7.5, 5))
-    sns.barplot(x='Processes', y='Total_WallClockTime', data=df, color='salmon')
+    sns.barplot(x='Processes', y='Total_WallClockTime', data=df, hue='Threads')
     plt.ylabel("Wallclock Time (m)")
     plt.xlabel("Processes")
-    plt.title(r'$\bf{(b)}$' + "\nParallelism across Chromosomes")
+    plt.title(r'$\bf{(b)}$')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_2.{iargs.extension}'), bbox_inches="tight")
     plt.close()

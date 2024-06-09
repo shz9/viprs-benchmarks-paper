@@ -362,7 +362,7 @@ def extract_relative_improvement_data(chrom=1):
                                         (data_improv_df['axpy_implementation'] == 'Manual')]
 
     data.append({
-        'Change': 'LD data layout',
+        'Change': 'C++ / CSR LD format',
         'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
     })
 
@@ -404,6 +404,20 @@ def extract_relative_improvement_data(chrom=1):
 
     data.append({
         'Change': '+ Threads: 4',
+        'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
+    })
+
+    # Sixth, show improvement with multithreading (8 threads)
+
+    data_improv_df = pd.read_csv(
+        f"data/benchmark_results/e_step/new_viprs/chr_{chrom}_timing_results_impcpp_modelALL_lmFalse_dqFalse_prfloat32_threads8.csv"
+    )
+
+    data_improv_df = data_improv_df.loc[(data_improv_df['Model'] == 'VIPRS') &
+                                        (data_improv_df['axpy_implementation'] == 'Manual')]
+
+    data.append({
+        'Change': '+ Threads: 8',
         'Improvement': mean_time_old_viprs / data_improv_df['TimePerIteration'].median()
     })
 
