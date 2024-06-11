@@ -27,7 +27,7 @@ from dask.diagnostics import ResourceProfiler
 # ------------------------------------------------------------------------
 
 
-def measure_e_step_performance(viprs_model, n_experiments=15, n_calls='auto', warm_up=5, initialize_once=False):
+def measure_e_step_performance(viprs_model, n_experiments=15, n_calls='auto', warm_up=10, initialize_once=False):
     """
     Measure the time it takes to execute the E-Step of a VIPRS model for `n_calls`.
     :param viprs_model: The VIPRS model to benchmark.
@@ -39,20 +39,18 @@ def measure_e_step_performance(viprs_model, n_experiments=15, n_calls='auto', wa
 
     def exec_func():
         if not initialize_once:
-            viprs_model.initialize()
+            viprs_model.initialize_variational_parameters()
         viprs_model.e_step()
 
     viprs_model.verbose = False
-
-    if initialize_once:
-        viprs_model.initialize()
+    viprs_model.initialize()
 
     if n_calls == 'auto':
         # If auto, then we will determine the number of calls automatically:
         # Here, we roughly repeat until the total time is at least ~1 second:
         # Note that the minimum number of calls is 5. If this takes too long,
         # then set the number of calls manually?
-        time_iter = math.ceil(1. / np.median(
+        time_iter = math.ceil(1. / np.min(
             timeit.repeat(exec_func, repeat=5 + warm_up, number=5)[warm_up:]
         ))
         n_calls = 5 * int(time_iter)

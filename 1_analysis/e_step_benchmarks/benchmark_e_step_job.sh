@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=def-sgravel
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=16
 #SBATCH --mem-per-cpu=2GB
-#SBATCH --time=05:00:00
+#SBATCH --time=10:00:00
 #SBATCH --output=./log/analysis/e_step_benchmarks/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
