@@ -14,7 +14,7 @@ def plot_panel_a(iargs):
     df = extract_e_step_stats(model='VIPRS', threads=None, aggregate=False)
     df = df.loc[df['ModelVersion'] == 'v0.1']
     df = df.groupby(['Model', 'ModelVersion', 'Chromosome', 'n_snps', 'Threads']).agg(
-        {'TimePerIteration': 'median'}
+        {'TimePerIteration': 'mean'}
     ).reset_index()
 
     plt.figure(figsize=(7.5, 5))

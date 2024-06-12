@@ -27,7 +27,7 @@ from dask.diagnostics import ResourceProfiler
 # ------------------------------------------------------------------------
 
 
-def measure_e_step_performance(viprs_model, n_experiments=15, n_calls='auto', warm_up=10, initialize_once=False):
+def measure_e_step_performance(viprs_model, n_experiments=15, n_calls=None, warm_up=10, initialize_once=False):
     """
     Measure the time it takes to execute the E-Step of a VIPRS model for `n_calls`.
     :param viprs_model: The VIPRS model to benchmark.
@@ -45,7 +45,7 @@ def measure_e_step_performance(viprs_model, n_experiments=15, n_calls='auto', wa
     viprs_model.verbose = False
     viprs_model.initialize()
 
-    if n_calls == 'auto':
+    if n_calls is None:
         # If auto, then we will determine the number of calls automatically:
         # Here, we roughly repeat until the total time is at least ~1 second:
         # Note that the minimum number of calls is 5. If this takes too long,
@@ -105,10 +105,10 @@ if __name__ == '__main__':
                         help='The number of experiments to run.')
     parser.add_argument('--n-experiments-grid', dest='n_experiments_grid', type=int, default=7,
                         help='The number of experiments to run for the grid model.')
-    parser.add_argument('--n-calls', dest='n_calls', default='auto',
+    parser.add_argument('--n-calls', dest='n_calls', type=int,
                         help='The number of times to call the E-Step in each experiment '
                              '(if set to auto, number of calls will be determined automatically).')
-    parser.add_argument('--n-calls-grid', dest='n_calls_grid', default='auto',
+    parser.add_argument('--n-calls-grid', dest='n_calls_grid', type=int,
                         help='The number of times to call the E-Step in each experiment for the grid model '
                              '(if set to auto, number of calls will be determined automatically).')
     parser.add_argument('--warm-up', dest='warm_up', type=int, default=10,

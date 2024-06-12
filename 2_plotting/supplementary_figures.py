@@ -22,9 +22,10 @@ def plot_relative_improvement(iargs):
     # Change the angle for the x-labels to 45 degrees:
     plt.xticks(rotation=45, ha='right')
 
-    plt.ylabel("Median improvement over v0.0.4")
+    plt.title("Improvement in Runtime-per-Iteration over v0.0.4 (CHR 1)")
+    plt.ylabel("Median Fold Improvement")
     plt.xlabel("Incremental changes (left -> right)")
-    plt.title("Fold runtime improvements in Coordinate Ascent Step")
+    # plt.title("Fold runtime improvements in Coordinate Ascent Step")
 
     plt.savefig(osp.join(iargs.output_dir, f'relative_improvement_e_step.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -74,9 +75,75 @@ def plot_accuracy_by_ld_mode(iargs):
 
     axs[0].set_ylabel("Prediction R-Squared")
 
-    plt.suptitle("Prediction accuracy as a function of LD Mode and Data Type")
-
     plt.savefig(osp.join(iargs.output_dir, f'accuracy_by_ld_mode.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
+
+
+def plot_e_step_runtime_all_models(iargs):
+    """
+    :param iargs: The commandline arguments captured by the argparse parser.
+    """
+
+    df = extract_e_step_stats(model=None, threads=None, aggregate=False)
+
+    fig, axs = plt.subplots(ncols=3, figsize=(15, 6), sharey=True,
+                            gridspec_kw={'wspace': 0.05, 'hspace': 0.05})
+
+    for i, model in enumerate(df.Model.unique()):
+
+        df_model = df.loc[df.Model == model]
+
+        df_model_old = df_model.loc[df_model['ModelVersion'] == 'v0.0.4']
+        df_model_old = df_model_old.groupby(['Model', 'ModelVersion', 'Chromosome', 'n_snps', 'Threads']).agg(
+            {'TimePerIteration': 'mean'}
+        ).reset_index()
+        df_model_old['Threads'] = 'v0.0.4'
+
+        sns.lineplot(data=df_model_old,
+                     x='n_snps', y='TimePerIteration',
+                     hue='Threads',
+                     linewidth=3,
+                     marker='o',
+                     palette={'v0.0.4': 'skyblue'},
+                     markersize=7,
+                     ax=axs[i])
+
+        df_model_new = df_model.loc[(df_model['ModelVersion'] == 'v0.1')]
+        df_model_new = df_model_new.groupby(['Model', 'ModelVersion', 'Chromosome', 'n_snps', 'Threads']).agg(
+            {'TimePerIteration': 'mean'}
+        ).reset_index()
+
+        sns.lineplot(data=df_model_new,
+                     x='n_snps', y='TimePerIteration', hue='Threads',
+                     linewidth=3,
+                     marker='o',
+                     markersize=7,
+                     ax=axs[i])
+        if i == 0:
+            axs[i].set_ylabel("Time per Iteration (s)")
+        else:
+            axs[i].set_ylabel(None)
+
+        if i == 1:
+            axs[i].set_xlabel("Variants per Chromosome")
+        else:
+            axs[i].set_xlabel(None)
+
+        if model == 'VIPRSGrid':
+            model = 'VIPRSGrid(J=100)'
+        axs[i].set_title(model, pad=10)
+        axs[i].set_yscale('log')
+
+    # Create a shared legend
+    handles, labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles, labels, title='Version / Threads', loc='center right', bbox_to_anchor=(1.08, 0.5))
+
+    # Remove individual legends from each subplot
+    for ax in axs:
+        ax.legend().set_visible(False)
+
+    plt.savefig(osp.join(iargs.output_dir, f'runtime_per_iteration_all_models.{iargs.extension}'),
+                bbox_inches="tight")
     plt.close()
 
 
@@ -101,3 +168,4 @@ if __name__ == '__main__':
 
     plot_relative_improvement(args)
     plot_accuracy_by_ld_mode(args)
+    plot_e_step_runtime_all_models(args)

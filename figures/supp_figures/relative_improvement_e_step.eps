@@ -1,13 +1,13 @@
 %!PS-Adobe-3.0 EPSF-3.0
-%%Title: panel_a.eps
+%%Title: relative_improvement_e_step.eps
 %%Creator: Matplotlib v3.7.2, https://matplotlib.org/
-%%CreationDate: Wed Jun 12 13:20:02 2024
+%%CreationDate: Wed Jun 12 13:20:15 2024
 %%Orientation: portrait
-%%BoundingBox: 73 131 539 661
-%%HiResBoundingBox: 73.493750 131.749375 538.506250 660.250625
+%%BoundingBox: 21 151 591 641
+%%HiResBoundingBox: 21.015550 151.360792 590.984450 640.639208
 %%EndComments
 %%BeginProlog
-/mpldict 12 dict def
+/mpldict 11 dict def
 mpldict begin
 /_d { bind def } bind def
 /m { moveto } _d
@@ -37,8 +37,8 @@ mpldict begin
 /FontMatrix [0.00048828125 0 0 0.00048828125 0 0] def
 /FontBBox [-1361 -665 4096 2060] def
 /FontType 3 def
-/Encoding [/space /parenleft /parenright /hyphen /period /zero /one /two /three /four /five /six /seven /eight /nine /B /D /G /I /L /M /P /R /S /V /a /c /d /e /f /g /i /m /n /o /p /r /s /t /u /v /x /y] def
-/CharStrings 44 dict dup begin
+/Encoding [/space /parenleft /parenright /plus /hyphen /period /slash /zero /one /two /three /four /six /eight /colon /greater /C /D /F /H /I /L /M /R /S /T /a /c /d /e /f /g /h /i /l /m /n /o /p /r /s /t /u /v] def
+/CharStrings 45 dict dup begin
 /.notdef 0 def
 /space{569 0 0 0 0 0 sc
 ce} _d
@@ -70,6 +70,22 @@ ce} _d
 435 -159 352 -306 253 -431 c
 
 ce} _d
+/plus{1196 0 114 237 1082 1206 sc
+513 237 m
+513 639 l
+114 639 l
+114 807 l
+513 807 l
+513 1206 l
+683 1206 l
+683 807 l
+1082 807 l
+1082 639 l
+683 639 l
+683 237 l
+513 237 l
+
+ce} _d
 /hyphen{682 0 65 440 618 621 sc
 65 440 m
 65 621 l
@@ -84,6 +100,14 @@ ce} _d
 391 205 l
 391 0 l
 186 0 l
+
+ce} _d
+/slash{569 0 0 -25 569 1491 sc
+0 -25 m
+425 1491 l
+569 1491 l
+145 -25 l
+0 -25 l
 
 ce} _d
 /zero{1139 0 85 -25 1041 1472 sc
@@ -205,32 +229,6 @@ ce} _d
 662 516 l
 
 ce} _d
-/five{1139 0 85 -25 1057 1446 sc
-85 384 m
-274 400 l
-288 308 320 239 371 192 c
-422 146 484 123 556 123 c
-643 123 716 156 776 221 c
-836 286 866 373 866 481 c
-866 584 837 665 779 724 c
-722 783 646 813 553 813 c
-495 813 443 800 396 773 c
-349 747 313 713 286 671 c
-117 693 l
-259 1446 l
-988 1446 l
-988 1274 l
-403 1274 l
-324 880 l
-412 941 504 972 601 972 c
-729 972 837 928 925 839 c
-1013 750 1057 636 1057 497 c
-1057 364 1018 250 941 153 c
-847 34 719 -25 556 -25 c
-423 -25 314 12 229 87 c
-145 162 97 261 85 384 c
-
-ce} _d
 /six{1139 0 77 -25 1045 1472 sc
 1019 1107 m
 840 1093 l
@@ -263,21 +261,6 @@ ce} _d
 726 763 658 792 576 792 c
 495 792 426 763 369 704 c
 312 646 284 570 284 475 c
-
-ce} _d
-/seven{1139 0 97 0 1046 1447 sc
-97 1274 m
-97 1447 l
-1046 1447 l
-1046 1307 l
-953 1208 860 1076 768 911 c
-677 746 606 577 556 403 c
-520 280 497 146 487 0 c
-302 0 l
-304 115 327 255 370 418 c
-413 581 475 739 556 890 c
-637 1042 724 1170 815 1274 c
-97 1274 l
 
 ce} _d
 /eight{1139 0 83 -25 1049 1472 sc
@@ -321,81 +304,55 @@ ce} _d
 296 577 268 507 268 423 c
 
 ce} _d
-/nine{1139 0 85 -25 1049 1472 sc
-112 339 m
-285 355 l
-300 274 328 215 369 178 c
-410 141 463 123 528 123 c
-583 123 632 136 673 161 c
-715 186 749 220 776 262 c
-803 305 825 362 843 434 c
-861 506 870 579 870 654 c
-870 662 870 674 869 690 c
-833 633 784 586 721 550 c
-659 515 592 497 519 497 c
-398 497 295 541 211 629 c
-127 717 85 833 85 977 c
-85 1126 129 1245 216 1336 c
-304 1427 414 1472 546 1472 c
-641 1472 728 1446 807 1395 c
-886 1344 946 1270 987 1175 c
-1028 1080 1049 943 1049 763 c
-1049 576 1029 426 988 315 c
-947 204 887 120 806 62 c
-726 4 632 -25 524 -25 c
-409 -25 316 7 243 70 c
-170 134 127 224 112 339 c
+/colon{569 0 185 0 390 1062 sc
+185 857 m
+185 1062 l
+390 1062 l
+390 857 l
+185 857 l
 
-849 986 m
-849 1089 821 1171 766 1232 c
-711 1293 645 1323 568 1323 c
-488 1323 418 1290 359 1225 c
-300 1160 270 1075 270 971 c
-270 878 298 802 354 743 c
-411 685 480 656 563 656 c
-646 656 715 685 768 743 c
-822 802 849 883 849 986 c
+185 0 m
+185 205 l
+390 205 l
+390 0 l
+185 0 l
 
 ce} _d
-/B{1366 0 150 0 1257 1466 sc
-150 0 m
-150 1466 l
-700 1466 l
-812 1466 902 1451 969 1421 c
-1037 1392 1090 1346 1128 1284 c
-1167 1223 1186 1158 1186 1091 c
-1186 1028 1169 969 1135 914 c
-1101 859 1050 814 981 780 c
-1070 754 1138 710 1185 647 c
-1233 584 1257 510 1257 425 c
-1257 356 1242 292 1213 233 c
-1184 174 1149 129 1106 97 c
-1063 65 1010 41 945 24 c
-881 8 802 0 709 0 c
-150 0 l
+/greater{1196 0 112 226 1083 1219 sc
+1083 641 m
+112 226 l
+112 405 l
+881 724 l
+112 1040 l
+112 1219 l
+1083 809 l
+1083 641 l
 
-344 850 m
-661 850 l
-747 850 809 856 846 867 c
-895 882 932 906 957 940 c
-982 974 995 1017 995 1068 c
-995 1117 983 1159 960 1196 c
-937 1233 903 1259 860 1272 c
-817 1286 742 1293 637 1293 c
-344 1293 l
-344 850 l
-
-344 173 m
-709 173 l
-772 173 816 175 841 180 c
-886 188 923 201 953 220 c
-983 239 1008 266 1027 301 c
-1046 337 1056 378 1056 425 c
-1056 480 1042 527 1014 567 c
-986 608 947 636 897 652 c
-848 669 776 677 683 677 c
-344 677 l
-344 173 l
+ce} _d
+/C{1479 0 102 -25 1398 1491 sc
+1204 514 m
+1398 465 l
+1357 306 1284 184 1178 100 c
+1073 17 944 -25 791 -25 c
+633 -25 504 7 405 71 c
+306 136 231 229 179 351 c
+128 473 102 604 102 744 c
+102 897 131 1030 189 1143 c
+248 1257 331 1343 438 1402 c
+546 1461 665 1491 794 1491 c
+941 1491 1064 1454 1164 1379 c
+1264 1304 1334 1199 1373 1064 c
+1182 1019 l
+1148 1126 1099 1203 1034 1252 c
+969 1301 888 1325 790 1325 c
+677 1325 583 1298 507 1244 c
+432 1190 379 1117 348 1026 c
+317 935 302 842 302 745 c
+302 620 320 511 356 418 c
+393 325 449 256 526 210 c
+603 164 686 141 775 141 c
+884 141 976 172 1051 235 c
+1126 298 1177 391 1204 514 c
 
 ce} _d
 /D{1479 0 158 0 1370 1466 sc
@@ -426,37 +383,34 @@ ce} _d
 352 173 l
 
 ce} _d
-/G{1593 0 109 -25 1465 1491 sc
-844 575 m
-844 747 l
-1465 748 l
-1465 204 l
-1370 128 1271 71 1170 32 c
-1069 -6 965 -25 858 -25 c
-714 -25 583 6 465 67 c
-348 129 259 218 199 335 c
-139 452 109 582 109 726 c
-109 869 139 1002 198 1125 c
-258 1249 344 1341 456 1401 c
-568 1461 697 1491 843 1491 c
-949 1491 1045 1474 1130 1439 c
-1216 1405 1283 1357 1332 1296 c
-1381 1235 1418 1155 1443 1056 c
-1268 1008 l
-1246 1083 1219 1141 1186 1184 c
-1153 1227 1107 1261 1046 1286 c
-985 1312 918 1325 844 1325 c
-755 1325 679 1311 614 1284 c
-549 1257 497 1222 457 1178 c
-418 1134 387 1086 365 1033 c
-328 942 309 844 309 738 c
-309 607 331 498 376 410 c
-421 322 487 257 573 214 c
-659 171 750 150 847 150 c
-931 150 1013 166 1093 198 c
-1173 231 1234 265 1275 302 c
-1275 575 l
-844 575 l
+/F{1251 0 168 0 1157 1466 sc
+168 0 m
+168 1466 l
+1157 1466 l
+1157 1293 l
+362 1293 l
+362 839 l
+1050 839 l
+1050 666 l
+362 666 l
+362 0 l
+168 0 l
+
+ce} _d
+/H{1479 0 164 0 1314 1466 sc
+164 0 m
+164 1466 l
+358 1466 l
+358 864 l
+1120 864 l
+1120 1466 l
+1314 1466 l
+1314 0 l
+1120 0 l
+1120 691 l
+358 691 l
+358 0 l
+164 0 l
 
 ce} _d
 /I{569 0 191 0 385 1466 sc
@@ -494,31 +448,6 @@ ce} _d
 339 1248 l
 339 0 l
 152 0 l
-
-ce} _d
-/P{1366 0 158 0 1277 1466 sc
-158 0 m
-158 1466 l
-711 1466 l
-808 1466 883 1461 934 1452 c
-1006 1440 1066 1417 1115 1383 c
-1164 1350 1203 1303 1232 1242 c
-1262 1181 1277 1115 1277 1042 c
-1277 917 1237 812 1158 725 c
-1079 639 935 596 728 596 c
-352 596 l
-352 0 l
-158 0 l
-
-352 769 m
-731 769 l
-856 769 945 792 998 839 c
-1051 886 1077 951 1077 1036 c
-1077 1097 1061 1150 1030 1193 c
-999 1237 959 1266 908 1280 c
-875 1289 815 1293 727 1293 c
-352 1293 l
-352 769 l
 
 ce} _d
 /R{1479 0 161 0 1453 1466 sc
@@ -593,17 +522,16 @@ ce} _d
 121 285 95 373 92 471 c
 
 ce} _d
-/V{1366 0 9 0 1350 1466 sc
-577 0 m
-9 1466 l
-219 1466 l
-600 401 l
-631 316 656 236 677 161 c
-700 241 726 321 756 401 c
-1152 1466 l
-1350 1466 l
-776 0 l
-577 0 l
+/T{1251 0 48 0 1210 1466 sc
+531 0 m
+531 1293 l
+48 1293 l
+48 1466 l
+1210 1466 l
+1210 1293 l
+725 1293 l
+725 0 l
+531 0 l
 
 ce} _d
 /a{1139 0 74 -24 1052 1086 sc
@@ -784,6 +712,27 @@ ce} _d
 279 774 251 678 251 550 c
 
 ce} _d
+/h{1139 0 135 0 1000 1466 sc
+135 0 m
+135 1466 l
+315 1466 l
+315 940 l
+399 1037 505 1086 633 1086 c
+712 1086 780 1070 838 1039 c
+896 1008 937 966 962 911 c
+987 856 1000 777 1000 673 c
+1000 0 l
+820 0 l
+820 673 l
+820 763 800 828 761 869 c
+722 910 667 931 596 931 c
+543 931 492 917 445 889 c
+398 862 365 824 345 777 c
+325 730 315 664 315 581 c
+315 0 l
+135 0 l
+
+ce} _d
 /i{455 0 136 0 316 1466 sc
 136 1259 m
 136 1466 l
@@ -796,6 +745,14 @@ ce} _d
 316 1062 l
 316 0 l
 136 0 l
+
+ce} _d
+/l{455 0 131 0 311 1466 sc
+131 0 m
+131 1466 l
+311 1466 l
+311 0 l
+131 0 l
 
 ce} _d
 /m{1706 0 135 0 1574 1086 sc
@@ -1018,136 +975,6 @@ ce} _d
 430 0 l
 
 ce} _d
-/x{1024 0 15 0 1009 1062 sc
-15 0 m
-403 552 l
-44 1062 l
-269 1062 l
-432 813 l
-463 766 487 726 506 694 c
-535 738 562 777 587 811 c
-766 1062 l
-981 1062 l
-614 562 l
-1009 0 l
-788 0 l
-570 330 l
-512 419 l
-233 0 l
-15 0 l
-
-ce} _d
-/y{1024 0 33 -431 1006 1062 sc
-127 -409 m
-107 -240 l
-146 -251 181 -256 210 -256 c
-250 -256 282 -249 306 -236 c
-330 -223 350 -204 365 -180 c
-376 -162 395 -117 420 -46 c
-423 -36 429 -21 436 -2 c
-33 1062 l
-227 1062 l
-448 447 l
-477 369 502 287 525 201 c
-546 284 570 364 599 443 c
-826 1062 l
-1006 1062 l
-602 -18 l
-559 -135 525 -215 501 -259 c
-469 -318 432 -362 391 -389 c
-350 -417 300 -431 243 -431 c
-208 -431 170 -424 127 -409 c
-
-ce} _d
-end readonly def
-
-/BuildGlyph {
- exch begin
- CharStrings exch
- 2 copy known not {pop /.notdef} if
- true 3 1 roll get exec
- end
-} _d
-
-/BuildChar {
- 1 index /Encoding get exch get
- 1 index /BuildGlyph get exec
-} _d
-
-FontName currentdict end definefont pop
-%!PS-Adobe-3.0 Resource-Font
-%%Creator: Converted from TrueType to Type 3 by Matplotlib.
-10 dict begin
-/FontName /DejaVuSans-Bold def
-/PaintType 0 def
-/FontMatrix [0.00048828125 0 0 0.00048828125 0 0] def
-/FontBBox [-2190 -850 4045 2405] def
-/FontType 3 def
-/Encoding [/parenleft /a /parenright] def
-/CharStrings 4 dict dup begin
-/.notdef 0 def
-/parenleft{936 0 176 -270 772 1554 sc
-772 -270 m
-475 -270 l
-373 -105 298 51 249 199 c
-200 348 176 495 176 641 c
-176 787 200 935 249 1084 c
-298 1234 374 1391 475 1554 c
-772 1554 l
-687 1396 623 1241 580 1090 c
-537 939 516 790 516 643 c
-516 496 537 346 579 195 c
-622 44 686 -111 772 -270 c
-
-ce} _d
-/a{1382 0 88 -29 1221 1147 sc
-674 504 m
-599 504 543 491 505 466 c
-468 441 449 403 449 354 c
-449 309 464 273 494 247 c
-525 222 567 209 621 209 c
-688 209 745 233 791 281 c
-837 330 860 390 860 463 c
-860 504 l
-674 504 l
-
-1221 639 m
-1221 0 l
-860 0 l
-860 166 l
-812 98 758 48 698 17 c
-638 -14 565 -29 479 -29 c
-363 -29 269 5 196 72 c
-124 140 88 228 88 336 c
-88 467 133 564 223 625 c
-314 686 456 717 649 717 c
-860 717 l
-860 745 l
-860 802 838 843 793 869 c
-748 896 679 909 584 909 c
-507 909 436 901 370 886 c
-304 871 243 848 186 817 c
-186 1090 l
-263 1109 340 1123 417 1132 c
-494 1142 572 1147 649 1147 c
-851 1147 997 1107 1086 1027 c
-1176 948 1221 818 1221 639 c
-
-ce} _d
-/parenright{936 0 164 -270 760 1554 sc
-164 -270 m
-249 -111 313 44 356 195 c
-399 346 420 496 420 643 c
-420 790 399 939 356 1090 c
-313 1241 249 1396 164 1554 c
-461 1554 l
-562 1391 637 1234 686 1084 c
-735 935 760 787 760 641 c
-760 495 736 348 687 199 c
-638 51 563 -105 461 -270 c
-164 -270 l
-
-ce} _d
 end readonly def
 
 /BuildGlyph {
@@ -1167,25 +994,178 @@ FontName currentdict end definefont pop
 end
 %%EndProlog
 mpldict begin
-73.494 131.749 translate
-465.012 528.501 0 0 clipbox
+21.016 151.361 translate
+569.969 489.278 0 0 clipbox
 gsave
 0 0 m
-465.0125 0 l
-465.0125 528.50125 l
-0 528.50125 l
+569.968901 0 l
+569.968901 489.278417 l
+0 489.278417 l
 cl
 1.000 setgray
 fill
 grestore
 gsave
-178.8125 53.59375 m
-457.8125 53.59375 l
-457.8125 497.11375 l
-178.8125 497.11375 l
+92.170463 184.909667 m
+538.570463 184.909667 l
+538.570463 462.109667 l
+92.170463 462.109667 l
 cl
 1.000 setgray
 fill
+grestore
+0.150 setgray
+/ArialMT 17.600 selectfont
+gsave
+
+16.1051 49.4741 translate
+45 rotate
+0 0 m /C glyphshow
+12.7056 0 m /plus glyphshow
+22.9801 0 m /plus glyphshow
+33.2546 0 m /space glyphshow
+38.1427 0 m /slash glyphshow
+43.0308 0 m /space glyphshow
+47.9189 0 m /C glyphshow
+60.6246 0 m /S glyphshow
+72.3595 0 m /R glyphshow
+85.0651 0 m /space glyphshow
+89.9532 0 m /L glyphshow
+99.738 0 m /D glyphshow
+112.444 0 m /space glyphshow
+117.332 0 m /f glyphshow
+122.22 0 m /o glyphshow
+132.005 0 m /r glyphshow
+137.864 0 m /m glyphshow
+152.519 0 m /a glyphshow
+162.304 0 m /t glyphshow
+grestore
+/ArialMT 17.600 selectfont
+gsave
+
+87.7406 31.6749 translate
+45 rotate
+0 0 m /plus glyphshow
+10.2745 0 m /space glyphshow
+15.1626 0 m /F glyphshow
+25.9095 0 m /l glyphshow
+29.8183 0 m /o glyphshow
+39.6031 0 m /a glyphshow
+49.3879 0 m /t glyphshow
+54.276 0 m /space glyphshow
+59.1641 0 m /p glyphshow
+68.9489 0 m /r glyphshow
+74.8078 0 m /e glyphshow
+84.5926 0 m /c glyphshow
+93.3895 0 m /i glyphshow
+97.2982 0 m /s glyphshow
+106.095 0 m /i glyphshow
+110.004 0 m /o glyphshow
+119.789 0 m /n glyphshow
+129.574 0 m /colon glyphshow
+134.462 0 m /space glyphshow
+139.35 0 m /f glyphshow
+144.238 0 m /l glyphshow
+148.147 0 m /o glyphshow
+157.931 0 m /a glyphshow
+167.716 0 m /t glyphshow
+172.604 0 m /three glyphshow
+182.389 0 m /two glyphshow
+grestore
+/ArialMT 17.600 selectfont
+gsave
+
+242.969 97.7783 translate
+45 rotate
+0 0 m /plus glyphshow
+10.2745 0 m /space glyphshow
+14.7876 0 m /T glyphshow
+25.5345 0 m /h glyphshow
+35.3194 0 m /r glyphshow
+41.1782 0 m /e glyphshow
+50.963 0 m /a glyphshow
+60.7478 0 m /d glyphshow
+70.5326 0 m /s glyphshow
+79.3295 0 m /colon glyphshow
+84.2176 0 m /space glyphshow
+89.1057 0 m /two glyphshow
+grestore
+/ArialMT 17.600 selectfont
+gsave
+
+332.249 97.7783 translate
+45 rotate
+0 0 m /plus glyphshow
+10.2745 0 m /space glyphshow
+14.7876 0 m /T glyphshow
+25.5345 0 m /h glyphshow
+35.3194 0 m /r glyphshow
+41.1782 0 m /e glyphshow
+50.963 0 m /a glyphshow
+60.7478 0 m /d glyphshow
+70.5326 0 m /s glyphshow
+79.3295 0 m /colon glyphshow
+84.2176 0 m /space glyphshow
+89.1057 0 m /four glyphshow
+grestore
+/ArialMT 17.600 selectfont
+gsave
+
+421.529 97.7783 translate
+45 rotate
+0 0 m /plus glyphshow
+10.2745 0 m /space glyphshow
+14.7876 0 m /T glyphshow
+25.5345 0 m /h glyphshow
+35.3194 0 m /r glyphshow
+41.1782 0 m /e glyphshow
+50.963 0 m /a glyphshow
+60.7478 0 m /d glyphshow
+70.5326 0 m /s glyphshow
+79.3295 0 m /colon glyphshow
+84.2176 0 m /space glyphshow
+89.1057 0 m /eight glyphshow
+grestore
+/ArialMT 19.200 selectfont
+gsave
+
+171.667 11.2312 translate
+0 rotate
+0 0 m /I glyphshow
+5.3309 0 m /n glyphshow
+16.0021 0 m /c glyphshow
+25.5958 0 m /r glyphshow
+31.9854 0 m /e glyphshow
+42.6566 0 m /m glyphshow
+58.6399 0 m /e glyphshow
+69.3111 0 m /n glyphshow
+79.9823 0 m /t glyphshow
+85.3132 0 m /a glyphshow
+95.9843 0 m /l glyphshow
+100.247 0 m /space glyphshow
+105.578 0 m /c glyphshow
+115.172 0 m /h glyphshow
+125.843 0 m /a glyphshow
+136.514 0 m /n glyphshow
+147.185 0 m /g glyphshow
+157.857 0 m /e glyphshow
+168.528 0 m /s glyphshow
+178.121 0 m /space glyphshow
+183.452 0 m /parenleft glyphshow
+189.842 0 m /l glyphshow
+194.105 0 m /e glyphshow
+204.776 0 m /f glyphshow
+210.107 0 m /t glyphshow
+215.438 0 m /space glyphshow
+220.769 0 m /hyphen glyphshow
+227.158 0 m /greater glyphshow
+238.363 0 m /space glyphshow
+243.694 0 m /r glyphshow
+250.084 0 m /i glyphshow
+254.347 0 m /g glyphshow
+265.018 0 m /h glyphshow
+275.689 0 m /t glyphshow
+281.02 0 m /parenright glyphshow
 grestore
 0.800 setlinewidth
 1 setlinejoin
@@ -1193,317 +1173,121 @@ grestore
 [] 0 setdash
 0.800 setgray
 gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 53.59375 m
-178.8125 497.11375 l
+446.4 277.2 92.17 184.91 clipbox
+92.170463 184.909667 m
+538.570463 184.909667 l
 stroke
 grestore
 0.150 setgray
 /ArialMT 17.600 selectfont
 gsave
 
-173.922 32.7 translate
+74.0892 178.613 translate
 0 rotate
 0 0 m /zero glyphshow
 grestore
 0.800 setgray
 gsave
-279 443.52 178.812 53.594 clipbox
-250.696633 53.59375 m
-250.696633 497.11375 l
+446.4 277.2 92.17 184.91 clipbox
+92.170463 240.791548 m
+538.570463 240.791548 l
 stroke
 grestore
 0.150 setgray
 /ArialMT 17.600 selectfont
 gsave
 
-245.806 32.7 translate
+64.308 234.495 translate
 0 rotate
-0 0 m /five glyphshow
-grestore
-0.800 setgray
-gsave
-279 443.52 178.812 53.594 clipbox
-322.580766 53.59375 m
-322.580766 497.11375 l
-stroke
-grestore
-0.150 setgray
-/ArialMT 17.600 selectfont
-gsave
-
-312.8 32.7 translate
-0 rotate
-0 0 m /one glyphshow
+0 0 m /two glyphshow
 9.78481 0 m /zero glyphshow
 grestore
 0.800 setgray
 gsave
-279 443.52 178.812 53.594 clipbox
-394.464899 53.59375 m
-394.464899 497.11375 l
+446.4 277.2 92.17 184.91 clipbox
+92.170463 296.673429 m
+538.570463 296.673429 l
 stroke
 grestore
 0.150 setgray
 /ArialMT 17.600 selectfont
 gsave
 
-384.684 32.7 translate
+64.308 290.377 translate
 0 rotate
-0 0 m /one glyphshow
-9.78481 0 m /five glyphshow
+0 0 m /four glyphshow
+9.78481 0 m /zero glyphshow
+grestore
+0.800 setgray
+gsave
+446.4 277.2 92.17 184.91 clipbox
+92.170463 352.55531 m
+538.570463 352.55531 l
+stroke
+grestore
+0.150 setgray
+/ArialMT 17.600 selectfont
+gsave
+
+64.308 346.258 translate
+0 rotate
+0 0 m /six glyphshow
+9.78481 0 m /zero glyphshow
+grestore
+0.800 setgray
+gsave
+446.4 277.2 92.17 184.91 clipbox
+92.170463 408.437192 m
+538.570463 408.437192 l
+stroke
+grestore
+0.150 setgray
+/ArialMT 17.600 selectfont
+gsave
+
+64.308 402.14 translate
+0 rotate
+0 0 m /eight glyphshow
+9.78481 0 m /zero glyphshow
 grestore
 /ArialMT 19.200 selectfont
 gsave
 
-193.016 11.2313 translate
-0 rotate
-0 0 m /S glyphshow
-12.7979 0 m /t glyphshow
-18.1288 0 m /o glyphshow
-28.8 0 m /r glyphshow
-35.1896 0 m /a glyphshow
-45.8607 0 m /g glyphshow
-56.5319 0 m /e glyphshow
-67.2031 0 m /space glyphshow
-72.534 0 m /parenleft glyphshow
-78.9236 0 m /G glyphshow
-93.8482 0 m /B glyphshow
-106.646 0 m /parenright glyphshow
-113.036 0 m /space glyphshow
-118.367 0 m /p glyphshow
-129.038 0 m /e glyphshow
-139.709 0 m /r glyphshow
-146.099 0 m /space glyphshow
-151.429 0 m /one glyphshow
-162.101 0 m /m glyphshow
-178.084 0 m /space glyphshow
-183.415 0 m /v glyphshow
-193.009 0 m /a glyphshow
-203.68 0 m /r glyphshow
-210.069 0 m /i glyphshow
-214.332 0 m /a glyphshow
-225.003 0 m /n glyphshow
-235.675 0 m /t glyphshow
-241.005 0 m /s glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-58.075 462.987 translate
-0 rotate
-0 0 m /V glyphshow
-11.7349 0 m /I glyphshow
-16.623 0 m /P glyphshow
-28.3579 0 m /R glyphshow
-41.0635 0 m /S glyphshow
-52.7984 0 m /parenleft glyphshow
-58.6573 0 m /v glyphshow
-67.4542 0 m /zero glyphshow
-77.239 0 m /period glyphshow
-82.1271 0 m /zero glyphshow
-91.9119 0 m /period glyphshow
-96.8 0 m /four glyphshow
-106.585 0 m /parenright glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-103.044 407.633 translate
-0 rotate
-0 0 m /L glyphshow
-9.78481 0 m /D glyphshow
-22.4904 0 m /p glyphshow
-32.2753 0 m /r glyphshow
-38.1341 0 m /e glyphshow
-47.9189 0 m /d glyphshow
-57.7037 0 m /two glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-97.1844 352.107 translate
-0 rotate
-0 0 m /S glyphshow
-11.7349 0 m /B glyphshow
-23.4698 0 m /a glyphshow
-33.2546 0 m /y glyphshow
-42.0515 0 m /e glyphshow
-51.8363 0 m /s glyphshow
-60.6331 0 m /R glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-32.6531 296.667 translate
-0 rotate
-0 0 m /V glyphshow
-11.7349 0 m /I glyphshow
-16.623 0 m /P glyphshow
-28.3579 0 m /R glyphshow
-41.0635 0 m /S glyphshow
-52.7984 0 m /parenleft glyphshow
-58.6573 0 m /v glyphshow
-67.4542 0 m /zero glyphshow
-77.239 0 m /period glyphshow
-82.1271 0 m /one glyphshow
-91.9119 0 m /parenright glyphshow
-97.7707 0 m /hyphen glyphshow
-103.63 0 m /f glyphshow
-108.518 0 m /p glyphshow
-118.303 0 m /six glyphshow
-128.087 0 m /four glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-116.747 241.337 translate
-0 rotate
-0 0 m /P glyphshow
-11.7349 0 m /R glyphshow
-24.4405 0 m /S glyphshow
-36.1754 0 m /c glyphshow
-44.9723 0 m /s glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-32.6531 185.787 translate
-0 rotate
-0 0 m /V glyphshow
-11.7349 0 m /I glyphshow
-16.623 0 m /P glyphshow
-28.3579 0 m /R glyphshow
-41.0635 0 m /S glyphshow
-52.7984 0 m /parenleft glyphshow
-58.6573 0 m /v glyphshow
-67.4542 0 m /zero glyphshow
-77.239 0 m /period glyphshow
-82.1271 0 m /one glyphshow
-91.9119 0 m /parenright glyphshow
-97.7707 0 m /hyphen glyphshow
-103.63 0 m /f glyphshow
-108.518 0 m /p glyphshow
-118.303 0 m /three glyphshow
-128.087 0 m /two glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-28.7469 130.347 translate
-0 rotate
-0 0 m /V glyphshow
-11.7349 0 m /I glyphshow
-16.623 0 m /P glyphshow
-28.3579 0 m /R glyphshow
-41.0635 0 m /S glyphshow
-52.7984 0 m /parenleft glyphshow
-58.6573 0 m /v glyphshow
-67.4542 0 m /zero glyphshow
-77.239 0 m /period glyphshow
-82.1271 0 m /one glyphshow
-91.9119 0 m /parenright glyphshow
-97.7707 0 m /hyphen glyphshow
-103.63 0 m /i glyphshow
-107.538 0 m /n glyphshow
-117.323 0 m /t glyphshow
-122.211 0 m /one glyphshow
-131.996 0 m /six glyphshow
-grestore
-/ArialMT 17.600 selectfont
-gsave
-
-38.5281 74.9075 translate
-0 rotate
-0 0 m /V glyphshow
-11.7349 0 m /I glyphshow
-16.623 0 m /P glyphshow
-28.3579 0 m /R glyphshow
-41.0635 0 m /S glyphshow
-52.7984 0 m /parenleft glyphshow
-58.6573 0 m /v glyphshow
-67.4542 0 m /zero glyphshow
-77.239 0 m /period glyphshow
-82.1271 0 m /one glyphshow
-91.9119 0 m /parenright glyphshow
-97.7707 0 m /hyphen glyphshow
-103.63 0 m /i glyphshow
-107.538 0 m /n glyphshow
-117.323 0 m /t glyphshow
-122.211 0 m /eight glyphshow
-grestore
-/ArialMT 19.200 selectfont
-gsave
-
-20.9344 190.58 translate
+56.4955 212.064 translate
 90 rotate
-0 0 m /L glyphshow
-10.6712 0 m /D glyphshow
-24.5278 0 m /space glyphshow
-29.8587 0 m /M glyphshow
-45.842 0 m /a glyphshow
-56.5132 0 m /t glyphshow
-61.8441 0 m /r glyphshow
-68.2337 0 m /i glyphshow
-72.4965 0 m /x glyphshow
-82.0903 0 m /space glyphshow
-87.4212 0 m /R glyphshow
-101.278 0 m /e glyphshow
-111.949 0 m /s glyphshow
-121.543 0 m /o glyphshow
-132.214 0 m /u glyphshow
-142.885 0 m /r glyphshow
-149.275 0 m /c glyphshow
-158.868 0 m /e glyphshow
+0 0 m /M glyphshow
+15.9833 0 m /e glyphshow
+26.6545 0 m /d glyphshow
+37.3257 0 m /i glyphshow
+41.5885 0 m /a glyphshow
+52.2597 0 m /n glyphshow
+62.9309 0 m /space glyphshow
+68.2618 0 m /F glyphshow
+79.9823 0 m /o glyphshow
+90.6534 0 m /l glyphshow
+94.9163 0 m /d glyphshow
+105.587 0 m /space glyphshow
+110.918 0 m /I glyphshow
+116.249 0 m /m glyphshow
+132.233 0 m /p glyphshow
+142.904 0 m /r glyphshow
+149.293 0 m /o glyphshow
+159.965 0 m /v glyphshow
+169.558 0 m /e glyphshow
+180.229 0 m /m glyphshow
+196.213 0 m /e glyphshow
+206.884 0 m /n glyphshow
+217.555 0 m /t glyphshow
 grestore
 0 setlinejoin
 0 setlinecap
 1.000 setgray
 gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 491.56975 m
-444.526786 491.56975 l
-444.526786 447.21775 l
-178.8125 447.21775 l
-cl
-gsave
-0.578 0.787 0.873 setrgbcolor
-fill
-grestore
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 436.12975 m
-300.445474 436.12975 l
-300.445474 391.77775 l
-178.8125 391.77775 l
-cl
-gsave
-0.827 setgray
-fill
-grestore
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 380.68975 m
-298.974402 380.68975 l
-298.974402 336.33775 l
-178.8125 336.33775 l
-cl
-gsave
-0.827 setgray
-fill
-grestore
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 325.24975 m
-280.099629 325.24975 l
-280.099629 280.89775 l
-178.8125 280.89775 l
+446.4 277.2 92.17 184.91 clipbox
+101.098463 184.909667 m
+172.522463 184.909667 l
+172.522463 246.914085 l
+101.098463 246.914085 l
 cl
 gsave
 0.914 0.555 0.514 setrgbcolor
@@ -1512,24 +1296,11 @@ grestore
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 269.80975 m
-257.938601 269.80975 l
-257.938601 225.45775 l
-178.8125 225.45775 l
-cl
-gsave
-0.827 setgray
-fill
-grestore
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 214.36975 m
-226.82523 214.36975 l
-226.82523 170.01775 l
-178.8125 170.01775 l
+446.4 277.2 92.17 184.91 clipbox
+190.378463 184.909667 m
+261.802463 184.909667 l
+261.802463 299.680249 l
+190.378463 299.680249 l
 cl
 gsave
 0.914 0.555 0.514 setrgbcolor
@@ -1538,11 +1309,11 @@ grestore
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 158.92975 m
-198.543759 158.92975 l
-198.543759 114.57775 l
-178.8125 114.57775 l
+446.4 277.2 92.17 184.91 clipbox
+279.658463 184.909667 m
+351.082463 184.909667 l
+351.082463 399.331772 l
+279.658463 399.331772 l
 cl
 gsave
 0.914 0.555 0.514 setrgbcolor
@@ -1551,11 +1322,24 @@ grestore
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
-178.8125 103.48975 m
-183.679544 103.48975 l
-183.679544 59.13775 l
-178.8125 59.13775 l
+446.4 277.2 92.17 184.91 clipbox
+368.938463 184.909667 m
+440.362463 184.909667 l
+440.362463 448.909667 l
+368.938463 448.909667 l
+cl
+gsave
+0.914 0.555 0.514 setrgbcolor
+fill
+grestore
+stroke
+grestore
+gsave
+446.4 277.2 92.17 184.91 clipbox
+458.218463 184.909667 m
+529.642463 184.909667 l
+529.642463 447.065021 l
+458.218463 447.065021 l
 cl
 gsave
 0.914 0.555 0.514 setrgbcolor
@@ -1568,42 +1352,27 @@ grestore
 1 setlinecap
 0.260 setgray
 gsave
-279 443.52 178.812 53.594 clipbox
+446.4 277.2 92.17 184.91 clipbox
 
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
+446.4 277.2 92.17 184.91 clipbox
 
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
+446.4 277.2 92.17 184.91 clipbox
 
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
+446.4 277.2 92.17 184.91 clipbox
 
 stroke
 grestore
 gsave
-279 443.52 178.812 53.594 clipbox
-
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
-
-stroke
-grestore
-gsave
-279 443.52 178.812 53.594 clipbox
+446.4 277.2 92.17 184.91 clipbox
 
 stroke
 grestore
@@ -1612,150 +1381,87 @@ grestore
 2 setlinecap
 0.800 setgray
 gsave
-178.8125 53.59375 m
-178.8125 497.11375 l
+92.170463 184.909667 m
+92.170463 462.109667 l
 stroke
 grestore
 gsave
-457.8125 53.59375 m
-457.8125 497.11375 l
+538.570463 184.909667 m
+538.570463 462.109667 l
 stroke
 grestore
 gsave
-178.8125 53.59375 m
-457.8125 53.59375 l
+92.170463 184.909667 m
+538.570463 184.909667 l
 stroke
 grestore
 gsave
-178.8125 497.11375 m
-457.8125 497.11375 l
+92.170463 462.109667 m
+538.570463 462.109667 l
 stroke
-grestore
-0.000 setgray
-/ArialMT 15.994 selectfont
-gsave
-
-273.459 465.261 translate
-0 rotate
-0 0 m /one glyphshow
-8.88974 0 m /eight glyphshow
-17.7795 0 m /period glyphshow
-22.2204 0 m /four glyphshow
-31.1102 0 m /eight glyphshow
-39.9999 0 m /two glyphshow
-48.8897 0 m /space glyphshow
-53.3306 0 m /G glyphshow
-65.7638 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-306.527 409.821 translate
-0 rotate
-0 0 m /eight glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /four glyphshow
-22.2204 0 m /six glyphshow
-31.1102 0 m /zero glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-304.982 354.381 translate
-0 rotate
-0 0 m /eight glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /three glyphshow
-22.2204 0 m /five glyphshow
-31.1102 0 m /eight glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-285.164 298.941 translate
-0 rotate
-0 0 m /seven glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /zero glyphshow
-22.2204 0 m /four glyphshow
-31.1102 0 m /five glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-261.895 243.501 translate
-0 rotate
-0 0 m /five glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /five glyphshow
-22.2204 0 m /zero glyphshow
-31.1102 0 m /four glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-229.226 188.061 translate
-0 rotate
-0 0 m /three glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /three glyphshow
-22.2204 0 m /four glyphshow
-31.1102 0 m /zero glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-199.53 132.621 translate
-0 rotate
-0 0 m /one glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /three glyphshow
-22.2204 0 m /seven glyphshow
-31.1102 0 m /two glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
-grestore
-/ArialMT 15.994 selectfont
-gsave
-
-183.923 77.1809 translate
-0 rotate
-0 0 m /zero glyphshow
-8.88974 0 m /period glyphshow
-13.3307 0 m /three glyphshow
-22.2204 0 m /three glyphshow
-31.1102 0 m /nine glyphshow
-39.9999 0 m /space glyphshow
-44.4409 0 m /G glyphshow
-56.874 0 m /B glyphshow
 grestore
 0.150 setgray
+/ArialMT 19.200 selectfont
 gsave
-302.812 507.114 translate
+
+67.972 468.11 translate
 0 rotate
-/DejaVuSans-Bold 19.200000000000003 selectfont
-0 0.4375 moveto
-/parenleft glyphshow
-8.76929 0.4375 moveto
-/a glyphshow
-21.7171 0.4375 moveto
-/parenright glyphshow
+0 0 m /I glyphshow
+5.3309 0 m /m glyphshow
+21.3142 0 m /p glyphshow
+31.9854 0 m /r glyphshow
+38.375 0 m /o glyphshow
+49.0462 0 m /v glyphshow
+58.6399 0 m /e glyphshow
+69.3111 0 m /m glyphshow
+85.2944 0 m /e glyphshow
+95.9656 0 m /n glyphshow
+106.637 0 m /t glyphshow
+111.968 0 m /space glyphshow
+117.299 0 m /i glyphshow
+121.561 0 m /n glyphshow
+132.233 0 m /space glyphshow
+137.564 0 m /R glyphshow
+151.42 0 m /u glyphshow
+162.091 0 m /n glyphshow
+172.762 0 m /t glyphshow
+178.093 0 m /i glyphshow
+182.356 0 m /m glyphshow
+198.34 0 m /e glyphshow
+209.011 0 m /hyphen glyphshow
+215.4 0 m /p glyphshow
+226.071 0 m /e glyphshow
+236.743 0 m /r glyphshow
+243.132 0 m /hyphen glyphshow
+249.522 0 m /I glyphshow
+254.853 0 m /t glyphshow
+260.184 0 m /e glyphshow
+270.855 0 m /r glyphshow
+277.244 0 m /a glyphshow
+287.916 0 m /t glyphshow
+293.246 0 m /i glyphshow
+297.509 0 m /o glyphshow
+308.18 0 m /n glyphshow
+318.852 0 m /space glyphshow
+324.183 0 m /o glyphshow
+334.854 0 m /v glyphshow
+344.447 0 m /e glyphshow
+355.119 0 m /r glyphshow
+361.508 0 m /space glyphshow
+366.839 0 m /v glyphshow
+376.433 0 m /zero glyphshow
+387.104 0 m /period glyphshow
+392.435 0 m /zero glyphshow
+403.106 0 m /period glyphshow
+408.437 0 m /four glyphshow
+419.108 0 m /space glyphshow
+424.439 0 m /parenleft glyphshow
+430.829 0 m /C glyphshow
+444.685 0 m /H glyphshow
+458.542 0 m /R glyphshow
+472.398 0 m /space glyphshow
+477.729 0 m /one glyphshow
+488.401 0 m /parenright glyphshow
 grestore
 
 end
