@@ -20,8 +20,9 @@ threads=${3:-1}
 jobs=${4:-1}
 low_mem=${5:-"false"}
 dequantize=${6:-"false"}
+lambda_min_opt=${7:-"set_zero"}
 
-model_id="l${ld_dtype}_m${low_mem}_q${dequantize}_t${threads}_j${jobs}"
+model_id="l${ld_dtype}_m${low_mem}_q${dequantize}_t${threads}_j${jobs}_lmo_${lambda_min_opt}"
 
 # Activate the virtual environment:
 source env/viprs/bin/activate
@@ -38,6 +39,15 @@ fi
 
 if [ "$dequantize" = "true" ]; then
   extra_params+=(--dequantize-on-the-fly)
+fi
+
+# If lambda_min_opt is set to "set_zero", then add the option --lambda-min 0.,
+# otherwise, set the option using the flag --lambda-min-option:
+
+if [ "$lambda_min_opt" = "set_zero" ]; then
+  extra_params+=(--lambda-min 0.)
+else
+  extra_params+=(--lambda-min-option "$lambda_min_opt")
 fi
 
 echo "==================== Copy the input data to local storage ===================="

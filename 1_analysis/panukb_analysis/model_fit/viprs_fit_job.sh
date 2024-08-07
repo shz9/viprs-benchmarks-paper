@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=ctb-sgravel
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=32GB
+#SBATCH --mem=50GB
 #SBATCH --time=04:00:00
 #SBATCH --output=./log/model_fit/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
@@ -21,8 +21,7 @@ viprs_fit -l "$ld_dir" \
          -s "$sumstats_file" \
          --sumstats-format "magenpy" \
          --output-dir "$output_dir" \
-         --hyp-search "BMA" \
-         --pi-steps 30 \
+         --exclude-lrld \
          --dequantize-on-the-fly \
          --output-profiler-metrics \
          --threads "$threads"

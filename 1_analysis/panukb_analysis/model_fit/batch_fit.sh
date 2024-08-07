@@ -2,17 +2,17 @@
 
 declare -A time_dict
 time_dict["hq_imputed_variants_hm3"]="00:20:00"
-time_dict["hq_imputed_variants_maf001"]="12:00:00"
-time_dict["hq_imputed_variants"]="48:00:00"
+time_dict["hq_imputed_variants_maf001"]="03:00:00"
+time_dict["hq_imputed_variants"]="06:00:00"
 
 declare -A threads_dict
-threads_dict["hq_imputed_variants_hm3"]=8
-threads_dict["hq_imputed_variants_maf001"]=16
-threads_dict["hq_imputed_variants"]=22
+threads_dict["hq_imputed_variants_hm3"]=4
+threads_dict["hq_imputed_variants_maf001"]=8
+threads_dict["hq_imputed_variants"]=16
 
 
 # Loop over the summary statistics files:
-for sumstats_file in data/sumstats/panukb_sumstats/EUR/50.sumstats.gz
+for sumstats_file in data/sumstats/panukb_sumstats/*/50.sumstats.gz
 do
   # Extract the population name from the file path:
   pop=$(basename "$(dirname "$sumstats_file")")
@@ -20,7 +20,7 @@ do
   pheno=$(basename $sumstats_file .sumstats.gz)
 
   # Loop over the available LD matrices for this population:
-  for ld_dir in data/ld/hq_imputed_variants_maf001/$pop
+  for ld_dir in data/ld/hq_imputed_variant*/$pop
   do
     # Extract the variant set name from the file path:
     variant_set=$(basename "$(dirname "$ld_dir")")

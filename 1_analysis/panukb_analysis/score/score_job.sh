@@ -14,7 +14,7 @@ fit_file=${1:-"data/model_fit/panukb_sumstats/hq_imputed_variants_hm3/EUR/50/VIP
 output_file=${2:-"data/score/panukb_sumstats/hq_imputed_variants_hm3/EUR/50"}
 genotype_dir=${3:-"data/ukbb_qc_genotypes/chr_*"}
 
-source "env/viprs2/bin/activate"
+source "env/viprs/bin/activate"
 
 viprs_score -f "$fit_file" \
             --bfile "$genotype_dir" \

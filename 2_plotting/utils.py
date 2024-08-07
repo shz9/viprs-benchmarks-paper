@@ -176,7 +176,7 @@ def extract_total_runtime_stats(ld_datatype='int8',
 
     total_files = [
         f"data/benchmark_results/total_runtime/fold_*/"
-        f"new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.txt",
+        f"new_viprs/l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}_lmo_set_zero.txt",
         "data/benchmark_results/total_runtime/fold_*/old_viprs.txt",
     ]
 
@@ -220,7 +220,8 @@ def extract_accuracy_metrics(ld_datatype='int8',
                              ld_mode='Triangular LD',
                              dequantize=False,
                              threads=1,
-                             jobs=1):
+                             jobs=1,
+                             lmo='set_zero'):
 
     if ld_mode is None:
         ld_mode = '*'
@@ -235,10 +236,11 @@ def extract_accuracy_metrics(ld_datatype='int8',
     ld_datatype = ld_datatype or '*'
     threads = threads or '*'
     jobs = jobs or '*'
+    lmo = lmo or '*'
 
     pred_files = [
         f"data/benchmark_results/prediction/fold_*/new_viprs/"
-        f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}.csv",
+        f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}_lmo_{lmo}.csv",
         "data/benchmark_results/prediction/fold_*/old_viprs.csv",
     ]
 
@@ -267,6 +269,7 @@ def extract_accuracy_metrics(ld_datatype='int8',
                 pred['Processes'] = int(fname.split('_')[4].replace('j', ''))
                 pred['Threads'] = int(fname.split('_')[3].replace('t', ''))
                 pred['Fold'] = int(osp.basename(osp.dirname(osp.dirname(f))).replace('fold_', ''))
+                pred['lambda_min'] = fname.split('lmo_')[1].replace('.csv', '')
 
                 pred['Dequantize'] = 'qtrue' in f
 
@@ -278,6 +281,7 @@ def extract_accuracy_metrics(ld_datatype='int8',
                 pred['Processes'] = 1
                 pred['Threads'] = 1
                 pred['Fold'] = int(osp.basename(osp.dirname(f)).replace('fold_', ''))
+                pred['lambda_min'] = 'set_zero'
 
             preds.append(pred)
 
@@ -446,7 +450,7 @@ def extract_profiler_data(ld_datatype='int8',
     jobs = jobs or '*'
 
     new_viprs_files = glob.glob(f"data/model_fit/benchmark_sumstats/fold_*/new_viprs/"
-                                f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}VIPRS*.prof")
+                                f"l{ld_datatype}_m{ld_mode}_q{dequantize}_t{threads}_j{jobs}_lmo_set_zeroVIPRS*.prof")
     old_viprs_files = glob.glob("data/model_fit/benchmark_sumstats/fold_*/old_viprs.prof")
 
     data = []

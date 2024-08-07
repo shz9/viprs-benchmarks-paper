@@ -47,7 +47,7 @@ echo "=========================== Model fit ==========================="
 
 # Perform evaluation using GWAS summary statistics from independent test set:
 deactivate
-source env/viprs2/bin/activate
+source env/viprs/bin/activate
 
 python 1_analysis/total_runtime_benchmarks/sumstats_evaluate.py \
         --fit-files "data/model_fit/benchmark_sumstats/$cv_fold/old_viprs*.fit*" \
