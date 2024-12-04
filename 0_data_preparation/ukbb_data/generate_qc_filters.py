@@ -34,6 +34,10 @@ ind_list = ind_list.loc[~ind_list.related]
 ind_list[['IID', 'IID']].to_csv("data/keep_files/ukbb_qc_individuals_all.keep",
                                 sep="\t", header=False, index=False)
 
+ind_list[['IID', 'IID'] + [f'PC{i+1}' for i in range(20)] + ['age', 'sex']].to_csv(
+    "data/covariates/covars_ukbb.txt", sep="\t", header=False, index=False
+)
+
 for pop in ind_list['pop'].unique():
 
     pop_df = ind_list.loc[ind_list['pop'] == pop, ['IID', 'IID']]

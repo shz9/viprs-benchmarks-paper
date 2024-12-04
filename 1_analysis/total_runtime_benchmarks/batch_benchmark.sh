@@ -10,7 +10,7 @@ threads=(1 2 4)
 jobs=(1 2 4)
 low_mem=("false" "true")
 dequantize=("false" "true")
-lambda_min_options=("infer" "infer_min" "infer_min_block")
+lambda_min_options=("set_zero") # ("infer" "infer_min" "infer_min_block")
 
 # Loop over the 5 training folds and launch the benchmarking jobs for
 # the new and old versions of VIPRS:
@@ -57,11 +57,11 @@ do
     done
   done
 
-  for lmo in "${lambda_min_options[@]}"
-  do
-    model_id="lint8_mfalse_qfalse_t1_j1_lmo_${lmo}"
-    sbatch -J "new_viprs_fold_${fold}_${model_id}" 1_analysis/total_runtime_benchmarks/benchmark_new_viprs.sh "fold_$fold" "int8" 1 1 "true" "false" "$lmo"
-  done
+  #for lmo in "${lambda_min_options[@]}"
+  #do
+  #  model_id="lint8_mfalse_qfalse_t1_j1_lmo_${lmo}"
+  #  sbatch -J "new_viprs_fold_${fold}_${model_id}" 1_analysis/total_runtime_benchmarks/benchmark_new_viprs.sh "fold_$fold" "int8" 1 1 "true" "false" "$lmo"
+  #done
 
   # Run sad old VIPRS with its single default setting:
   sbatch -J "old_viprs_fold_$fold" 1_analysis/total_runtime_benchmarks/benchmark_old_viprs.sh "fold_$fold"

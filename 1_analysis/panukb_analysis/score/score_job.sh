@@ -22,5 +22,4 @@ viprs_score -f "$fit_file" \
             --backend "plink" \
             --compress
 
-
 echo "Job finished with exit code $? at: `date`"

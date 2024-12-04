@@ -2,6 +2,9 @@ import argparse
 import seaborn as sns
 import matplotlib.pyplot as plt
 from magenpy.utils.system_utils import makedir
+import sys
+import os.path as osp
+sys.path.append(osp.dirname(osp.dirname(osp.abspath(__file__))))
 from utils import *
 
 
@@ -149,7 +152,7 @@ def plot_e_step_runtime_all_models(iargs):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Plot the panels of Figure 3.')
+    parser = argparse.ArgumentParser(description='Plot benchmarking supplementary figures.')
     parser.add_argument('--output-dir', dest='output_dir', type=str,
                         default='figures/supp_figures/',
                         help='The directory where to store the figure panels.')
@@ -169,3 +172,18 @@ if __name__ == '__main__':
     plot_relative_improvement(args)
     plot_accuracy_by_ld_mode(args)
     plot_e_step_runtime_all_models(args)
+
+
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='block', population='EUR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3',  ld_estimator='block', population='AFR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='block', population='EAS')
+
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_maf001', ld_estimator='block', population='EUR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants', ld_estimator='block', population='EUR')
+
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='windowed', population='EUR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='windowed', population='AFR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='windowed', population='EAS')
+
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants_maf001', ld_estimator='windowed', population='EUR')
+    plot_ld_min_eigenvalues(args, 'hq_imputed_variants', ld_estimator='windowed', population='EUR')

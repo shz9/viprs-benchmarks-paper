@@ -5,8 +5,6 @@ import glob
 import os.path as osp
 
 
-
-
 def extract_performance_statistics(time_file):
     """
     Extract relevant performance statistics from the output of
@@ -497,3 +495,140 @@ def extract_profiler_data(ld_datatype='int8',
         raise Exception("Found no data for the benchmarking of the models.")
 
     return pd.concat(data)
+
+
+def load_phenotype_metadata():
+    """
+    Load the phenotype metadata from the pan-ukb-sumstats repository.
+    :return: A DataFrame with the phenotype metadata
+    """
+
+    pheno_df = pd.read_csv("data/sumstats/panukb_sumstats/subset_pheno_manifest.csv")
+
+    trait_category_map = {
+        'Biological samples > Assay results > Blood assays > Blood biochemistry': 'Blood biochemistry',
+        'UK Biobank Assessment Centre > Touchscreen > Lifestyle and environment > Sleep': 'Other',
+        'UK Biobank Assessment Centre > Touchscreen > Lifestyle and environment > Sun exposure': 'Other',
+        'UK Biobank Assessment Centre > Touchscreen > Lifestyle and environment > Smoking': 'Other',
+        'UK Biobank Assessment Centre > Verbal interview > Medical conditions': 'Medical history',
+        'UK Biobank Assessment Centre > Physical measures > Anthropometry > Body size measures': 'Anthropometry',
+        'UK Biobank Assessment Centre > Touchscreen > Health and medical history > General health': 'Medical history',
+        'UK Biobank Assessment Centre > Touchscreen > Health and medical history > Eyesight': 'Medical history',
+        'UK Biobank Assessment Centre > Physical measures > Anthropometry > Impedance measures': 'Anthropometry',
+        'Biological samples > Assay results > Blood assays > Blood count': 'Blood count',
+        'Biological samples > Assay results > Urine assays': 'Other',
+        'UK Biobank Assessment Centre > Physical measures > Spirometry': 'Spirometry',
+        'UK Biobank Assessment Centre > Physical measures > Blood pressure': 'Physical measures',
+        'UK Biobank Assessment Centre > Physical measures > Arterial stiffness': 'Physical measures',
+        'UK Biobank Assessment Centre > Physical measures > Hand grip strength': 'Physical measures',
+        'UK Biobank Assessment Centre > Cognitive function > Pairs matching': 'Other'
+    }
+
+    pheno_df = pheno_df.loc[pheno_df['pop'] == 'EUR']
+    pheno_df['general_category'] = pheno_df.category.map(trait_category_map)
+    pheno_df = pheno_df[
+        ['phenocode', 'description', 'general_category', 'estimates.final.h2_observed']].drop_duplicates()
+
+    #other_traits = pd.DataFrame([
+    #    {'phenocode': 30760, 'description': 'HDL Cholesterol', 'general_category': 'Blood biochemistry'},
+    #    {'phenocode': 30780, 'description': 'LDL Cholesterol', 'general_category': 'Blood biochemistry'},
+    #    {'phenocode': 30690, 'description': 'Total Cholesterol', 'general_category': 'Blood biochemistry'},
+    #])
+
+    return pheno_df #pd.concat([pheno_df, other_traits])
+
+
+def get_phenotype_category_palette():
+
+    import seaborn as sns
+
+    # Map the Set2 color palette to the phenotype categories:
+    categories = ['Blood biochemistry', 'Anthropometry', 'Blood count', 'Medical history', 'Physical measures',
+                  'Spirometry', 'Other']
+    palette = sns.color_palette('Dark2', n_colors=len(categories))
+
+    return dict(zip(categories, palette))
+
+
+def extract_aggregate_evaluation_metrics(sumstats_origin='panukb_sumstats',
+                                         test_cohort=None):
+
+    test_cohort = test_cohort or '*'
+
+    dfs = []
+
+    for f in glob.glob(f"data/evaluation/{test_cohort}/{sumstats_origin}/hq_imputed_variant*/*/*/*/*.eval"):
+
+        df = pd.read_csv(f, sep="\t")
+
+        test_cohort, _, variant_set, ld_est, train_pop, pheno_code, test_pop = f.split("/")[-7:]
+        df['Test_pop'] = test_pop.replace(".eval", "")
+        df['phenocode'] = int(pheno_code)
+        df['Training_pop'] = train_pop
+        df['LDEstimator'] = ld_est
+        df['LD_w_MI'] = '_mi' in ld_est
+        df['Variant_set'] = variant_set
+        df['Test_cohort'] = test_cohort
+        dfs.append(df)
+
+    pheno_df = load_phenotype_metadata()
+
+    dfs = pd.concat(dfs)
+    dfs = dfs.merge(pheno_df, how='left')
+
+    return dfs
+
+
+def extract_aggregate_performance_metrics(sumstats_origin='panukb_sumstats'):
+    """
+    TODO: Complete this function...
+    """
+
+    dfs = []
+
+    for f in glob.glob(f"data/model_fit/{sumstats_origin}/hq_imputed_variant*/block_EUR_mi/EUR/*/VIPRS_EM.prof"):
+        variant_set, ld_est, _, pheno, _ = f.split("/")[-5:]
+        df = pd.read_csv(f, sep="\t")
+        dfs.append({
+            'Variant_set': variant_set,
+            'LDEstimator': ld_est,
+            'phenocode': pheno,
+            'Total_LoadTime': df.Load_time.sum(),
+            'Total_FitTime': df.Fit_time.sum(),
+            'Peak_Memory_MB': df.iloc[0, -1],
+            'DataPrep_Time': df.iloc[0, -2],
+            'Total_WallClockTime': df.iloc[0, -3]
+        })
+
+    return pd.DataFrame(dfs)
+
+
+def pivot_evaluation_df(eval_df, metric='Incremental_R2'):
+
+    def flatten_columns(df):
+        """
+        Solution from: https://stackoverflow.com/a/57630176
+        """
+
+        level_one = df.columns.get_level_values(0).astype(str)
+        level_two = df.columns.get_level_values(1).astype(str)
+        column_separator = ['_' if x != '' else '' for x in level_two]
+        df.columns = level_one + column_separator + level_two
+        return df
+
+    pivot_cols = ['Training_pop', 'Test_pop', 'phenocode',
+                  'description', 'general_category',
+                  'estimates.final.h2_observed']
+
+    values = [metric]
+    if metric + '_err' in eval_df.columns:
+        values += [metric + '_err']
+
+    pivoted_df = eval_df.pivot_table(index=pivot_cols,
+                                     columns='Variant_set',
+                                     values=values).reset_index()
+
+    if len(values) > 1:
+        pivoted_df = flatten_columns(pivoted_df)
+
+    return pivoted_df

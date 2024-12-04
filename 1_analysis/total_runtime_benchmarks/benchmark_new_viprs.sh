@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=def-sgravel
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=20
 #SBATCH --mem-per-cpu=2GB
 #SBATCH --time=00:45:00
 #SBATCH --output=./log/analysis/total_runtime_benchmarks/%x.out

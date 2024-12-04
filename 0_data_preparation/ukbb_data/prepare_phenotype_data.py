@@ -35,5 +35,5 @@ for pheno in df.columns[1:]:
     print(f"Processing phenotype: {pheno}")
     sub_df = df[['eid', 'eid', pheno]].copy()
     sub_df.columns = ['FID', 'IID', pheno]
-    sub_df[pheno] = np.where(detect_outliers(sub_df[pheno]), np.nan, sub_df[pheno])
-    sub_df.to_csv(f"data/phenotypes/{pheno}.txt", sep="\t", header=False, index=False)
+    sub_df[pheno] = np.where(detect_outliers(sub_df[pheno], sigma_threshold=3), np.nan, sub_df[pheno])
+    sub_df.to_csv(f"data/phenotypes/ukbb/{pheno}.txt", sep="\t", header=False, index=False)

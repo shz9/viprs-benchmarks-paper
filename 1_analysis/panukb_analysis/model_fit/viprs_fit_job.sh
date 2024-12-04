@@ -22,6 +22,7 @@ viprs_fit -l "$ld_dir" \
          --sumstats-format "magenpy" \
          --output-dir "$output_dir" \
          --exclude-lrld \
+         --lambda-min 0. \
          --dequantize-on-the-fly \
          --output-profiler-metrics \
          --threads "$threads"

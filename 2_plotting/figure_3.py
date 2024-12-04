@@ -18,15 +18,15 @@ def plot_panel_a(iargs):
     ).reset_index()
 
     plt.figure(figsize=(7.5, 5))
-    sns.lineplot(data=df,
+    g = sns.lineplot(data=df,
                  x='n_snps', y='TimePerIteration', hue='Threads',
                  linewidth=3,
                  marker='o',
                  markersize=7)
     plt.ylabel("Time per Iteration (s)")
     plt.xlabel("Variants per Chromosome")
-    plt.title(r'$\bf{(a)}$' + "\nMulti-threading across variants",
-              pad=10)
+    g.set_title(r'$\bf{(a)}$' + " Multi-threading across variants",
+              pad=10, loc='left')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_1.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -39,10 +39,10 @@ def plot_panel_a(iargs):
     # Generate a grouped barplot that shows the improvement in total runtime
     # for difference processes (x-axis) and number of threads (`hue`):
     plt.figure(figsize=(7.5, 5))
-    sns.barplot(x='Processes', y='Total_WallClockTime', data=df, hue='Threads')
+    g = sns.barplot(x='Processes', y='Total_WallClockTime', data=df, hue='Threads')
     plt.ylabel("Wallclock Time (m)")
     plt.xlabel("Processes")
-    plt.title(r'$\bf{(b)}$')
+    g.set_title(r'$\bf{(b)}$' + " Multi-processing & Multi-threading", loc='left')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_2.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -94,7 +94,7 @@ def plot_panel_b(iargs):
                 legend=False)
     axs[0].set_ylabel('Peak Memory (GB)')
     axs[0].set_xticklabels(axs[0].get_xticklabels(), rotation=90)
-    axs[0].set_title(r'$\bf{(c)}$')
+    axs[0].set_title(r'$\bf{(c)}$', loc='left')
 
     # Plot the total time:
     sns.barplot(x='LD Mode', y='Total_WallClockTime',
@@ -107,7 +107,7 @@ def plot_panel_b(iargs):
     axs[1].set_ylabel('Wallclock Time (m)')
     # Rotate the x-axis tick labels:
     axs[1].set_xticklabels(axs[1].get_xticklabels(), rotation=90)
-    axs[1].set_title(r'$\bf{(d)}$')
+    axs[1].set_title(r'$\bf{(d)}$', loc='left')
 
     sns.barplot(x='LD Mode', y='TimePerIteration',
                 order=sorted(e_step_df['LD Mode'].unique()),
@@ -117,7 +117,7 @@ def plot_panel_b(iargs):
     axs[2].set_ylabel('Time per Iteration (s)')
     axs[2].set_xticklabels(axs[2].get_xticklabels(), rotation=90)
     axs[2].legend(title='Threads', prop={'size': 10}, title_fontsize=12)
-    axs[2].set_title(r'$\bf{(e)}$')
+    axs[2].set_title(r'$\bf{(e)}$', loc='left')
 
     sub_prof_df = prof_df.loc[~((prof_df['LD Mode'] == 'Triangular+DQF')
                               & (prof_df['LD Data Type'].isin(['float32', 'float64'])))]
@@ -132,7 +132,7 @@ def plot_panel_b(iargs):
     axs[3].set_xticklabels(axs[3].get_xticklabels(), rotation=90)
     axs[3].set_ylabel("LD Matrix Load Time (s)")
     axs[3].legend(prop={'size': 12})
-    axs[3].set_title(r'$\bf{(f)}$')
+    axs[3].set_title(r'$\bf{(f)}$', loc='left')
 
     plt.tight_layout()
     plt.savefig(osp.join(iargs.output_dir, f'panel_b.{iargs.extension}'))

@@ -4,6 +4,8 @@ import subprocess
 
 def inspect_log_files(path, error_terms=('error', 'OptimizationDivergence', 'Exception')):
 
+    error_free = True
+
     for err in error_terms:
         try:
             output = subprocess.check_output(f"grep -i '{err}' {path}",
@@ -16,9 +18,9 @@ def inspect_log_files(path, error_terms=('error', 'OptimizationDivergence', 'Exc
             print(f"The log files at {path} contain one or more error terms.\nSearch term: {err}")
             print("&& && && && && && && && && && && && && && && && && && && && && && && && ")
             print(output)
-            return False
+            error_free = False
 
-    return True
+    return error_free
 
 
 if __name__ == '__main__':

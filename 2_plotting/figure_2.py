@@ -37,7 +37,7 @@ def plot_panel_a(iargs):
     add_labels_to_bars(ax, rotation=0., orientation='horizontal', units='GB')
     plt.xlabel("Storage (GB) per 1m variants")
     plt.ylabel("LD Matrix Resource")
-    plt.title(r"$\bf{(a)}$", pad=10)
+    plt.title(r"$\bf{(a)}$ LD Storage Requirements", pad=10, loc='left')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -76,7 +76,7 @@ def plot_panel_b(iargs):
     ax1.set_xlabel(None)
     ax1.set_ylabel(None)
     ax1.set_yticks(np.arange(0, 10, 2))
-    ax1.set_title(r'$\bf{(b)}$' + '\nWallclock Time (m)', pad=10)
+    ax1.set_title(r'$\bf{(b)}$' + '\nWallclock Time (m)', pad=10, loc='left')
 
     # Plot the peak memory:
     sns.barplot(x='Model', y='Peak_Memory_GB',
@@ -88,7 +88,7 @@ def plot_panel_b(iargs):
     ax2.set_xlabel(None)
     ax2.set_ylabel(None)
     ax2.set_yticks(np.arange(0, 3., .5))
-    ax2.set_title(r'$\bf{(c)}$' + '\nPeak Memory (GB)', pad=10)
+    ax2.set_title(r'$\bf{(c)}$' + '\nPeak Memory (GB)', pad=10, loc='left')
 
     # Plot prediction accuracy:
     sns.barplot(x='Model', y='R-Squared',
@@ -101,7 +101,7 @@ def plot_panel_b(iargs):
     ax3.set_xlabel(None)
     ax3.set_ylabel(None)
     ax3.set_yticks(np.arange(0, 0.35, 0.05))
-    ax3.set_title(r'$\bf{(d)}$' + '\nPrediction R-Squared', pad=10)
+    ax3.set_title(r'$\bf{(d)}$' + '\nPrediction' + r' $R^2$', pad=10, loc='left')
 
     # Plot the avg time per E-Step and per chromosome:
     sns.lineplot(x='n_snps', y='TimePerIteration',
@@ -116,7 +116,7 @@ def plot_panel_b(iargs):
     ax4.set_yscale('log')
     ax4.set_xlabel('Variants per Chromosome')
     ax4.set_ylabel('Time per Iteration (s)')
-    ax4.set_title(r"$\bf{(e)}$")
+    ax4.set_title(r"$\bf{(e)}$ Runtime per coordinate ascent step", loc='left')
 
     plt.tight_layout()
     plt.savefig(osp.join(iargs.output_dir, f'panel_b.{iargs.extension}'))
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     # Set seaborn context:
     sns.set_style("whitegrid")
-    sns.set_context("paper", font_scale=2)
+    sns.set_context("paper", font_scale=1.8)
 
     # Create the output directory if it does not exist:
     makedir(args.output_dir)

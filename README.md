@@ -1,8 +1,4 @@
-# viprs-benchmarks-paper
-Code and scripts to reproduce our analyses in the VIPRS benchmarks manuscript
+# Towards whole-genome inference of polygenic scores with fast and memory-efficient algorithms
 
+Scripts and guidelines to reproduce our analyses in the new VIPRS benchmarking manuscript.
 
-## TODO
-
-- [ ] Upload summary statistics used for benchmarking to Zenodo / figshare.
-- 
