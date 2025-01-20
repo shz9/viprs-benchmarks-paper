@@ -9,6 +9,6 @@
 
 source env/viprs2/bin/activate
 
-python 0_data_preparation/ukbb_data/process_panukb_sumstats.py
+python 0_data_preparation/external_sumstats/process_panukb_sumstats.py
 
 echo "Job finished with exit code $? at: `date`"

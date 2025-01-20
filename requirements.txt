@@ -1,4 +1,4 @@
-viprs
+viprs==0.1.2
 pandas
 numpy
 matplotlib

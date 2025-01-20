@@ -2,7 +2,7 @@ import argparse
 import subprocess
 
 
-def inspect_log_files(path, error_terms=('error', 'OptimizationDivergence', 'Exception')):
+def inspect_log_files(path, error_terms=('error', 'OptimizationDivergence', 'Exception', 'Errno')):
 
     error_free = True
 

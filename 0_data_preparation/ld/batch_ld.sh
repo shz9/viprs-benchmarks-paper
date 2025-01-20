@@ -1,11 +1,11 @@
 #!/bin/bash
 
 VARIANT_SET=${1:-"hq_imputed_variants_hm3"}
-LD_ESTIMATOR=${2:-"windowed"}
+LD_ESTIMATOR=${2:-"block"}
 STORAGE_DTYPE=${3:-"int8"}
-BACKEND=${4:-"plink"}
+BACKEND=${4:-"xarray"}
 
-pops=("AMR" "CSA" "MID")  ## ("AFR" "AMR" "CSA" "EAS" "EUR" "MID")
+pops=("AFR" "AMR" "CSA" "EAS" "EUR" "MID")
 
 declare -A time_dict
 time_dict["hq_imputed_variants_hm3"]="08:00:00"
