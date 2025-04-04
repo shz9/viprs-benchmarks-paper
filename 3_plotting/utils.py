@@ -550,19 +550,27 @@ def extract_external_evaluation_metrics(test_cohort=None):
 
     dfs = []
 
-    for f in glob.glob(f"data/evaluation/{test_cohort}/external/*/*/*/*/*.eval"):
+    for f in glob.glob(f"data/evaluation/{test_cohort}/*/external/*/*/*/*/*.eval"):
+
         df = pd.read_csv(f, sep="\t")
 
-        test_cohort, _, _, train_pop, pheno_code, model, test_pop = f.split("/")[-7:]
+        test_cohort, _, _, _, train_pop, pheno_code, model, test_pop = f.split("/")[-8:]
         df['Test_pop'] = test_pop.replace(".eval", "")
         df['phenocode'] = int(pheno_code)
         df['Training_pop'] = train_pop
         df['Test_cohort'] = test_cohort
         df['Model'] = model
+
+        # Empty fields (to align with VIPRS):
+        df['LDEstimator'] = np.nan
+        df['LD_datatype'] = np.nan
+        df['LD_w_MI'] = np.nan
+        df['Variant_set'] = np.nan
+
         dfs.append(df)
 
-    pheno_df = load_phenotype_metadata()
     dfs = pd.concat(dfs)
+    pheno_df = load_phenotype_metadata()
     dfs = dfs.merge(pheno_df, how='left')
 
     return dfs
@@ -605,26 +613,69 @@ def extract_aggregate_evaluation_metrics(sumstats_origin='panukb_sumstats',
     return dfs
 
 
+def extract_aggregate_performance_metrics_external():
+
+    dfs = []
+
+    for f in glob.glob("data/model_fit/panukb_sumstats/external/*/EUR/*/*_detailed.prof"):
+
+        stats = extract_performance_statistics(f.replace('_detailed', ''))
+        df = pd.read_csv(f, sep="\t")
+
+        pheno, model = f.split("/")[-2:]
+        model = model.replace('_detailed.prof', '')
+
+        try:
+            total_runtime = df['Total_WallClockTime'][0]
+        except KeyError:
+            total_runtime = np.nan
+
+        try:
+            total_fit_time = df['Total_FitTime'][0]
+        except KeyError:
+            total_fit_time = np.nan
+
+        try:
+            data_prep_time = df['DataPrep_Time'][0]
+        except KeyError:
+            data_prep_time = np.nan
+
+        dfs.append({
+            'Model': model,
+            'phenocode': pheno,
+            'Peak_Memory_MB': stats['Peak_Memory_GB'] * 1024,
+            'Total_WallClockTime': total_runtime,
+            'Total_FitTime': total_fit_time,
+            'DataPrep_Time': data_prep_time,
+        })
+
+    return pd.DataFrame(dfs)
+
+
 def extract_aggregate_performance_metrics(sumstats_origin='panukb_sumstats',
                                           ld_estimator='block_int8_mi',
-                                          variant_set=None):
+                                          variant_set=None,
+                                          model='VIPRS_EM'):
 
     variant_set = variant_set or 'hq_imputed_variant*'
 
     dfs = []
 
-    for f in glob.glob(f"data/model_fit/{sumstats_origin}/{variant_set}/{ld_estimator}/EUR/*/VIPRS_EM.prof"):
-        var_set, ld_est, _, pheno, _ = f.split("/")[-5:]
+    for f in glob.glob(f"data/model_fit/{sumstats_origin}/{variant_set}/{ld_estimator}/EUR/*/{model}.prof"):
+        var_set, ld_est, _, pheno, model = f.split("/")[-5:]
+        model = model.replace('.prof', '')
         df = pd.read_csv(f, sep="\t")
         dfs.append({
+            'Model': model,
             'Variant_set': var_set,
             'LDEstimator': ld_est,
             'phenocode': pheno,
             'Total_LoadTime': df.Load_time.sum(),
             'Total_FitTime': df.Fit_time.sum(),
-            'Peak_Memory_MB': df.iloc[0, -1],
-            'DataPrep_Time': df.iloc[0, -2],
-            'Total_WallClockTime': df.iloc[0, -3]
+            'Total_iterations': df.Total_Iterations.sum(),
+            'Peak_Memory_MB': df.Peak_Memory_MB.iloc[0],
+            'DataPrep_Time': df.DataPrep_Time[0],
+            'Total_WallClockTime': df.Total_WallClockTime[0]
         })
 
     return pd.DataFrame(dfs)
@@ -646,6 +697,9 @@ def pivot_evaluation_df(eval_df, metric='Incremental_R2', columns='Variant_set')
     pivot_cols = ['Training_pop', 'Test_pop', 'Test_cohort', 'phenocode',
                   'description', 'general_category',
                   'estimates.final.h2_observed']
+
+    if 'Test cohort' in eval_df.columns:
+        pivot_cols += ['Test cohort']
 
     values = [metric]
     if metric + '_err' in eval_df.columns:

@@ -25,12 +25,11 @@ def plot_relative_improvement(iargs):
     sns.barplot(x='Change', y='Improvement', data=df, color='salmon')
 
     # Change the angle for the x-labels to 45 degrees:
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks(rotation=45, ha='right', size='small')
 
-    plt.title("Improvement in Runtime-per-Iteration over v0.0.4 (CHR 1)")
-    plt.ylabel("Median Fold Improvement")
+    plt.title("Relative runtime-per-iteration (v0.0.4 / v0.1)\n(Chromosome 1; 92206 variants)")
+    plt.ylabel("Relative runtime-per-iteration\n(Ratio of medians)", size='small')
     plt.xlabel("Incremental changes (left -> right)")
-    # plt.title("Fold runtime improvements in Coordinate Ascent Step")
 
     plt.savefig(osp.join(iargs.output_dir, f'relative_improvement_e_step.{iargs.extension}'), bbox_inches="tight")
     plt.close()

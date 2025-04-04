@@ -105,6 +105,40 @@ def plot_ld_min_eigenvalues(iargs,
     return eigs_tab
 
 
+def compare_min_eigenvalue_int16_float64(iargs):
+
+    import magenpy as mgp
+
+    results = []
+
+    for chrom in range(1, 23):
+        ldm_float64 = mgp.LDMatrix.from_path(f"data/ld/eur/converted/ukbb_50k_windowed/float64/chr_{chrom}")
+        ldm_int16 = mgp.LDMatrix.from_path(f"data/ld/eur/converted/ukbb_50k_windowed/int16/chr_{chrom}")
+
+        extremal_eigs_fp64 = ldm_float64.estimate_extremal_eigenvalues()
+        extremal_eigs_int16 = ldm_int16.estimate_extremal_eigenvalues()
+
+        results.append({
+            'Chromosome': chrom,
+            'float64': np.abs(np.minimum(extremal_eigs_fp64['min'], 0.)),
+            'int16': np.abs(np.minimum(extremal_eigs_int16['min'], 0.))
+        })
+
+    results = pd.DataFrame(results)
+
+    sns.scatterplot(data=results, x='float64', y='int16')
+    plt.xlabel(r"$|min(\lambda_{min}, 0)|$ (float64)")
+    plt.ylabel(r"$|min(\lambda_{min}, 0)|$ (int16)")
+
+    max_min_eig = results[['float64', 'int16']].max().max()
+
+    # Add diagonal line (from 0. to maximum values across both axes):
+    plt.plot([0, max_min_eig], [0, max_min_eig], color='grey', linestyle='--')
+
+    plt.savefig(osp.join(iargs.output_dir, f'lambda_min_int16_vs_float64.{iargs.extension}'))
+    plt.close()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Plot the panels of Figure 3.')
@@ -122,6 +156,7 @@ if __name__ == '__main__':
 
     sns.set_context("paper")
 
+    """
     plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='windowed', population='EUR',
                             exclude_lrld=True)
 
@@ -134,3 +169,6 @@ if __name__ == '__main__':
 
     plot_ld_min_eigenvalues(args, 'hq_imputed_variants_hm3', ld_estimator='block', population='EUR')
     plot_ld_min_eigenvalues(args, 'hq_imputed_variants_maf001', ld_estimator='block', population='EUR')
+    """
+
+    compare_min_eigenvalue_int16_float64(args)

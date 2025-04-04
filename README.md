@@ -133,20 +133,34 @@ source 1_benchmarks/e_step_benchmarks/batch_benchmark_e_step.sh
 
 ### **(3) Pan-UK Biobank experiments** (`2_panukb_analysis/`)
 
-The analyses in this step are aimed at evaluating the performance of the `viprs` software on large-scale 
-GWAS summary statistics from the Pan-UK Biobank data resource. This step is broken down into 3 sub-tasks:
+The analyses in this step are aimed at evaluating the performance of the various PRS models (including `VIPRS`) 
+on large-scale GWAS summary statistics from the Pan-UK Biobank data resource. 
+This step is broken down into 3 sub-tasks:
 
-1. **PRS inference** (`2_panukb_analysis/model_fit/`): This task involves using `viprs v0.1.2` to perform PRS 
-inference on the GWAS summary statistics for the 75 phenotypes and across the 3 variant sets. If you have access 
-to a `SLURM` system, the main script that you need to run is:
+1. **PRS inference** (`2_panukb_analysis/model_fit/`): This task involves performing PRS 
+inference on the GWAS summary statistics for the 75 phenotypes, potentially using different LD reference panels.
+The methods represented are `viprs` (new version), `old_viprs` (older version), `SBayesRC`, `LDpred2`, 
+and `PRScs`. Each of these methods has its own subdirectory with appropriate setup scripts that download the software,
+install the dependencies, and run the inference. If you have access to a `SLURM` system, you can run
+the inference for each method by invoking the `batch_fit.sh` script in the corresponding subdirectory.
+
+For example, the following commands will run the standard version of `VIPRS` on all 75 phenotypes and 3 variant sets:
+
 
 ```bash
-source 2_panukb_analysis/model_fit/batch_fit.sh panukb_sumstats hq_imputed_variants_hm3 block int8
-source 2_panukb_analysis/model_fit/batch_fit.sh panukb_sumstats hq_imputed_variants_maf001 block int8
-source 2_panukb_analysis/model_fit/batch_fit.sh panukb_sumstats hq_imputed_variants block int8
+source 2_panukb_analysis/model_fit/viprs/batch_fit.sh panukb_sumstats hq_imputed_variants_hm3 block int8
+source 2_panukb_analysis/model_fit/viprs/batch_fit.sh panukb_sumstats hq_imputed_variants_maf001 block int8
+source 2_panukb_analysis/model_fit/viprs/batch_fit.sh panukb_sumstats hq_imputed_variants block int8
 ```
 
-This script will submit `SLURM` jobs to perform PRS inference for all phenotypes and variant sets.
+To run `SBayesRC`, first you need to call `source 2_panukb_analysis/model_fit/SBayesRC/setup_sbayesrc_env.sh` to set up the environment. 
+Then you can run the inference by executing the script `batch_fit.sh` in the `SBayesRC` subdirectory.
+
+```bash
+source 2_panukb_analysis/model_fit/SBayesRC/batch_fit.sh
+source 2_panukb_analysis/model_fit/SBayesRC/batch_fit.sh 7m
+```
+
 
 2. **Computing Polygenic Scores (linear scoring)** (`2_panukb_analysis/score/`): This task involves computing polygenic
 scores for all participants in the UK Biobank and CARTaGENE Biobank. Assume you have access to the individual-level

@@ -9,34 +9,25 @@ from utils import (
     extract_aggregate_evaluation_metrics,
     extract_external_evaluation_metrics,
     extract_aggregate_performance_metrics,
+    extract_aggregate_performance_metrics_external,
     pivot_evaluation_df,
     get_phenotype_category_palette
 )
 
 
-def plot_panel_c(iargs):
-    # Extract the data:
-    eval_df = extract_aggregate_evaluation_metrics()
-    eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR')]
-    pivoted_df = pivot_evaluation_df(eval_df, metric=iargs.metric)
-
-    pivoted_df['Test cohort'] = pivoted_df['Test_cohort'].map(
-        {'ukbb': 'UKB', 'cartagene': 'CARTaGENE'}) + '-' + pivoted_df['Test_pop']
+def plot_scatter_per_cohort(dataset,
+                            x_col,
+                            x_label,
+                            y_col,
+                            y_label,
+                            title=None,
+                            x_err=None,
+                            y_err=None):
 
     test_cohorts = ['CARTaGENE-EUR', 'UKB-AMR', 'UKB-MID', 'UKB-CSA', 'UKB-EAS', 'UKB-AFR']
 
-    if iargs.metric + '_err' in eval_df.columns:
-        x_col = iargs.metric + '_hq_imputed_variants_hm3'
-        y_col = iargs.metric + '_hq_imputed_variants'
-        xerr = iargs.metric + '_err_hq_imputed_variants_hm3'
-        yerr = iargs.metric + '_err_hq_imputed_variants'
-    else:
-        x_col = 'hq_imputed_variants_hm3'
-        y_col = 'hq_imputed_variants'
-        xerr = yerr = None
-
     # Create figure with extra space on the right for legend
-    fig = plt.figure(figsize=(12.5, 7))  # Increased width to accommodate legend
+    fig = plt.figure(figsize=(12.5, 7))
 
     # Create GridSpec to manage subplot layout
     gs = fig.add_gridspec(2, 4, width_ratios=(2, 2, 2, 1))  # 2 rows, 4 columns (3 for plots, 1 for legend)
@@ -49,7 +40,8 @@ def plot_panel_c(iargs):
             axes.append(ax)
 
     for i, test_cohort in enumerate(test_cohorts):
-        subset = pivoted_df.loc[pivoted_df['Test cohort'] == test_cohort]
+
+        subset = dataset.loc[dataset['Test cohort'] == test_cohort]
         g = sns.scatterplot(data=subset,
                             x=x_col,
                             y=y_col,
@@ -59,24 +51,19 @@ def plot_panel_c(iargs):
 
         legend = g.get_legend()
 
-        if iargs.add_scatter_errorbars and xerr is not None:
+        if x_err is not None and y_err is not None:
+
             hue_categories = [text.get_text() for text in legend.get_texts()]
             colors = [handle.get_color() for handle in legend.legend_handles]
 
             for category, color in zip(hue_categories, colors):
                 axes[i].errorbar(x=x_col,
                                  y=y_col,
-                                 xerr=xerr,
-                                 yerr=yerr,
+                                 xerr=x_err,
+                                 yerr=y_err,
                                  data=subset.loc[subset.general_category == category],
                                  linestyle='None', label=None, capsize=2, capthick=0.5,
                                  lw=.5, alpha=.65, color=color)
-
-        if iargs.add_line:
-            from utils import plot_line_with_annotation
-            plot_line_with_annotation(axes[i], intercept=0., slope=np.mean(subset[y_col] / subset[x_col]),
-                                      color='darkred', linestyle='--', lw=.8,
-                                      label='Avg. improvement')
 
         lims = max(max(axes[i].get_ylim()), max(axes[i].get_xlim()))
         x = np.linspace(0, lims, 1000)
@@ -97,16 +84,16 @@ def plot_panel_c(iargs):
     legend_ax.axis('off')
 
     # Add legends
-    legend_1 = legend_ax.legend(handles[:-(2 + int(iargs.add_line))],
-                                labels[:-(2 + int(iargs.add_line))],
+    legend_1 = legend_ax.legend(handles[:-2],
+                                labels[:-2],
                                 title='Phenotype category',
                                 loc='center',
                                 bbox_to_anchor=(0.25, 0.75))
     legend_1.get_frame().set_linewidth(0.0)
     legend_ax.add_artist(legend_1)
 
-    legend_2 = legend_ax.legend(handles=handles[-(2 + int(iargs.add_line)):],
-                                labels=labels[-(2 + int(iargs.add_line)):],
+    legend_2 = legend_ax.legend(handles=handles[-2:],
+                                labels=labels[-2:],
                                 title='Reference lines',
                                 loc='center',
                                 bbox_to_anchor=(0.25, 0.3))
@@ -114,168 +101,43 @@ def plot_panel_c(iargs):
     legend_ax.add_artist(legend_2)
 
     # Add labels
-    fig.supxlabel("HapMap3+ Incremental $R^2$")
-    fig.supylabel("MAC > 20 (18m variants) Incremental $R^2$")
-    fig.suptitle(r'$\bf{(c)}$' + " Out-of-sample prediction accuracy (HapMap3+ vs. 18m variants)", x=0.01,
-                 horizontalalignment='left')
+    fig.supxlabel(x_label)
+    fig.supylabel(y_label)
 
-    plt.tight_layout()
-    plt.savefig(osp.join(iargs.output_dir, f'panel_c.{iargs.extension}'))
-    plt.close()
+    if title is not None:
+        fig.suptitle(title, x=0.01, horizontalalignment='left')
 
 
-def plot_panel_d(iargs):
+def plot_panel_c(iargs):
     # Extract the data:
-
-    sns.set_context("paper", font_scale=1.)
-
-    eval_df = extract_aggregate_evaluation_metrics(test_cohort='cartagene')
-    eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR') &
-                          (eval_df['Test_pop'] == 'EUR')]
+    eval_df = extract_aggregate_evaluation_metrics()
+    eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR')]
     pivoted_df = pivot_evaluation_df(eval_df, metric=iargs.metric)
+
+    pivoted_df['Test cohort'] = pivoted_df['Test_cohort'].map(
+        {'ukbb': 'UKB', 'cartagene': 'CARTaGENE'}) + '-' + pivoted_df['Test_pop']
 
     if iargs.metric + '_err' in eval_df.columns:
         x_col = iargs.metric + '_hq_imputed_variants_hm3'
-        y_col = iargs.metric + '_hq_imputed_variants_maf001'
+        y_col = iargs.metric + '_hq_imputed_variants'
         xerr = iargs.metric + '_err_hq_imputed_variants_hm3'
-        yerr = iargs.metric + '_err_hq_imputed_variants_maf001'
+        yerr = iargs.metric + '_err_hq_imputed_variants'
     else:
         x_col = 'hq_imputed_variants_hm3'
-        y_col = 'hq_imputed_variants_maf001'
+        y_col = 'hq_imputed_variants'
         xerr = yerr = None
 
-    fig, ax = plt.subplots(figsize=(4.5, 4))
+    plot_scatter_per_cohort(pivoted_df,
+                            x_col=x_col,
+                            x_label="HapMap3+ Incremental $R^2$",
+                            y_col=y_col,
+                            y_label="MAC > 20 (18m variants) Incremental $R^2$",
+                            title=r'$\bf{(c)}$' + " Out-of-sample prediction accuracy (HapMap3+ vs. 18m variants)",
+                            x_err=xerr,
+                            y_err=yerr)
 
-    g = sns.scatterplot(data=pivoted_df,
-                        x=x_col,
-                        y=y_col,
-                        hue='general_category',
-                        palette=get_phenotype_category_palette(),
-                        s=40,
-                        ax=ax)
-
-    legend = g.get_legend()
-
-    if iargs.add_scatter_errorbars and xerr is not None:
-        hue_categories = [text.get_text() for text in legend.get_texts()]
-        colors = [handle.get_color() for handle in legend.legend_handles]
-
-        for category, color in zip(hue_categories, colors):
-            ax.errorbar(x=x_col,
-                        y=y_col,
-                        xerr=xerr,
-                        yerr=yerr,
-                        data=pivoted_df.loc[pivoted_df.general_category == category],
-                        linestyle='None', label=None, capsize=2, capthick=0.5,
-                        lw=.5, alpha=.65, color=color)
-
-    if iargs.add_line:
-        from utils import plot_line_with_annotation
-
-        plot_line_with_annotation(ax, intercept=0., slope=np.mean(pivoted_df[y_col] / pivoted_df[x_col]),
-                                  color='darkred', linestyle='--', lw=.8)
-
-    lims = max(max(ax.get_ylim()), max(ax.get_xlim()))
-    x = np.linspace(0, lims, 1000)
-    g.plot(x, x, ls='--', lw=.8, color='grey', label='y = x')
-    g.plot(x, 2. * x, ls='--', lw=.8, color='#007FFF', label='y = 2x')
-    g.set_ylim((0., lims))
-    g.set_xlim((0., lims))
-    g.set_title('Test Cohort: CARTaGENE-EUR')
-
-    legend.remove()
-
-    g.set_xlabel("HapMap3+ Incremental $R^2$")
-    g.set_ylabel("MAF > 0.001 (13m variants) Incremental $R^2$")
-
-    fig.suptitle(r'$\bf{(d)}$' + " Cross-biobank validation (UKB → CARTaGENE)",
-                 x=0,
-                 horizontalalignment='left')
-
-    plt.savefig(osp.join(iargs.output_dir, f'panel_d.{iargs.extension}'), bbox_inches="tight")
-    plt.close()
-
-
-def plot_panel_e(iargs):
-
-    def add_error_bars(ax, df, hue_order, metric='Incremental_R2'):
-
-        num_hues = len(hue_order)
-        dodge_dists = np.linspace(-0.4, 0.4, 2 * num_hues + 1)[1::2]
-        ordered_groups = [l.get_text() for l in ax.get_xticklabels()]
-        # Are there better ways to do the same thing?
-        for i, hue in enumerate(hue_order):
-            dodge_dist = dodge_dists[i]
-            df_hue = df.loc[df['Variant Set'] == hue].copy()
-
-            df_hue['ordered_group'] = df_hue["Test cohort"].map(
-                dict(zip(ordered_groups, range(len(ordered_groups))))
-            )
-            df_hue = df_hue.sort_values('ordered_group')
-            bars = ax.errorbar(data=df_hue, x='Test cohort', y=metric,
-                               yerr=f'{metric}_err', ls='',
-                               lw=0.75, color='black')
-            xys = bars.lines[0].get_xydata()
-            bars.remove()
-            ax.errorbar(data=df_hue, x=xys[:, 0] + dodge_dist, y=metric,
-                        yerr=f'{metric}_err', ls='',
-                        lw=0.75, color='black')
-
-    sns.set_context("paper", font_scale=1.5)
-
-    eval_df = extract_aggregate_evaluation_metrics()
-    eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR')]
-
-    eval_df_extern = extract_external_evaluation_metrics()
-    eval_df_extern['Variant_set'] = eval_df_extern['Model']
-
-    cols_in_common = list(set(eval_df.columns).intersection(set(eval_df_extern.columns)))
-    eval_df = pd.concat([eval_df[cols_in_common], eval_df_extern[cols_in_common]])
-
-    eval_df['Test cohort'] = eval_df['Test_cohort'].map(
-        {'ukbb': 'UKB', 'cartagene': 'CARTaGENE'}) + '-' + eval_df['Test_pop']
-    eval_df = eval_df.loc[eval_df.description.isin(['Sitting height', 'Standing height']) &
-                          eval_df['Test cohort'].isin(['UKB-AFR', 'UKB-AMR', 'UKB-CSA',
-                                                       'UKB-EAS', 'UKB-MID', 'CARTaGENE-EUR'])]
-
-    eval_df['Variant Set'] = eval_df['Variant_set'].map({
-        'hq_imputed_variants': 'MAC > 20 (18m)',
-        'hq_imputed_variants_maf001': 'MAF > 0.001 (13m)',
-        'hq_imputed_variants_hm3': 'HapMap3+',
-        'SBayesRC_7m': 'SBayesRC (7m)',
-        'Yengo_height': 'Yengo et al. (2022)'
-    })
-
-    g = sns.catplot(data=eval_df, kind='bar', x='Test cohort', y=iargs.metric, row='description',
-                    hue_order=['HapMap3+', 'MAF > 0.001 (13m)', 'MAC > 20 (18m)', 'SBayesRC (7m)', 'Yengo et al. (2022)'],
-                    palette={
-                        'HapMap3+': '#87CEEB',
-                        'MAF > 0.001 (13m)': '#20B2AA',
-                        'MAC > 20 (18m)': '#008080',
-                        'SBayesRC (7m)': '#5F9C3F',
-                        'Yengo et al. (2022)': '#FFE134',
-                    },
-                    order=['CARTaGENE-EUR', 'UKB-AMR', 'UKB-MID', 'UKB-CSA', 'UKB-EAS', 'UKB-AFR'],
-                    hue='Variant Set',
-                    height=3,
-                    aspect=7.5 / 3)
-
-    for ax in g.axes.flat:
-        pheno = ax.get_title().split('=')[-1].strip()
-        ax.set_title(pheno)
-        ax.set_ylabel('Incremental $R^2$')
-        data = eval_df[eval_df['description'] == pheno]
-
-        add_error_bars(ax, data, hue_order=['HapMap3+', 'MAF > 0.001 (13m)',
-                                            'MAC > 20 (18m)', 'SBayesRC (7m)',
-                                            'Yengo et al. (2022)'], metric=iargs.metric)
-
-    g.set_xticklabels(ax.get_xticklabels(), rotation=30)
-    plt.suptitle(r'$\bf{(e)}$' + ' Height prediction accuracy using all well-imputed variants',
-                 x=0, y=1.05,
-                 horizontalalignment='left')
-
-    plt.savefig(osp.join(iargs.output_dir, f'panel_e.{iargs.extension}'), bbox_inches="tight")
+    plt.tight_layout()
+    plt.savefig(osp.join(iargs.output_dir, f'panel_c.{iargs.extension}'))
     plt.close()
 
 
@@ -332,6 +194,284 @@ def plot_panels_a_b(iargs):
     plt.close()
 
 
+def plot_method_comparison(iargs):
+
+    eval_df = extract_aggregate_evaluation_metrics(ld_estimator='block_int8_mi',
+                                                   model='*VIPRS_*')
+    eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR')]
+    eval_df = eval_df.loc[eval_df['Model'] != 'NOLRLD_VIPRS_EM']
+
+    eval_df['Model'] = eval_df['Model'].map({
+        'VIPRS_EM': 'VIPRS v0.1 ',
+        'VIPRS_GS': 'VIPRS-GS v0.1 ',
+        'pathwise_VIPRS_GS': 'VIPRS-GSp v0.1 ',
+    }) + eval_df['Variant_set'].map({
+        'hq_imputed_variants_hm3': '(HM3)',
+        'hq_imputed_variants_maf001': '(13m)',
+        'hq_imputed_variants': '(18m)'
+    }) + eval_df['LDEstimator'].apply(lambda x: ['', '-4cM'][x == 'block4cm_int8_mi'])
+
+    eval_df = eval_df.loc[eval_df['Model'].isin([
+        'VIPRS v0.1 (HapMap3)', 'VIPRS-GSp v0.1 (HM3)',
+        'VIPRS v0.1 (13m)', 'VIPRS-GSp v0.1 (13m)',
+        'VIPRS v0.1 (18m)', 'VIPRS-GSp v0.1 (18m)',
+    ])]
+
+    eval_df['Model'] = eval_df['Model'].map({
+        'VIPRS v0.1 (HapMap3)': 'VIPRS v0.1 (HM3)',
+        'VIPRS-GSp v0.1 (HapMap3)': 'VIPRS-GS v0.1 (HM3)',
+        'VIPRS v0.1 (13m)': 'VIPRS v0.1 (13m)',
+        'VIPRS-GSp v0.1 (13m)': 'VIPRS-GS v0.1 (13m)',
+        'VIPRS v0.1 (18m)': 'VIPRS v0.1 (18m)',
+        'VIPRS-GSp v0.1 (18m)': 'VIPRS-GS v0.1 (18m)',
+    })
+
+    eval_df_extern = extract_external_evaluation_metrics()
+    eval_df_extern = eval_df_extern.loc[eval_df_extern['Model'].isin([
+        'LDpred2-auto', 'VIPRS_v0.0.4', 'SBayesRC-HapMap3', 'SBayesRC-7m'
+        ])]
+
+    eval_df_extern['Model'] = eval_df_extern['Model'].map({
+        'LDpred2-auto': 'LDpred2-auto (HM3)',
+        'VIPRS_v0.0.4': 'VIPRS v0.0.4 (HM3)',
+        'SBayesRC-HapMap3': 'SBayesRC (HM3)',
+        'SBayesRC-7m': 'SBayesRC (7m)',
+    })
+
+    eval_df = pd.concat([eval_df, eval_df_extern])
+
+    eval_df['Test cohort'] = eval_df['Test_cohort'].map(
+        {'ukbb': 'UKB', 'cartagene': 'CARTaGENE'}
+    ) + '-' + eval_df['Test_pop']
+
+    model_order = ['LDpred2-auto (HM3)', 'VIPRS v0.0.4 (HM3)',
+                   'VIPRS v0.1 (HM3)', 'VIPRS v0.1 (13m)', 'VIPRS v0.1 (18m)',
+                   'VIPRS-GS v0.1 (HM3)', 'VIPRS-GS v0.1 (13m)', 'VIPRS-GS v0.1 (18m)',
+                   'SBayesRC (HM3)', 'SBayesRC (7m)']
+
+    palette = {
+        'LDpred2-auto (HM3)': '#FA8072',  # Salmon
+        'VIPRS v0.0.4 (HM3)': '#D8BFD8',  # Thistle
+        'VIPRS v0.1 (HM3)': '#87CEEB',  # Light Sky Blue
+        'VIPRS v0.1 (13m)': '#20B2AA',  # Light Sea Green
+        'VIPRS v0.1 (18m)': '#008080',  # Teal
+        'VIPRS-GS v0.1 (HM3)': '#FAFAD2',  # Light Goldenrod Yellow
+        'VIPRS-GS v0.1 (13m)': '#FFDAB9',  # Peach Puff
+        'VIPRS-GS v0.1 (18m)': '#FFE4E1',  # Misty Rose
+        'SBayesRC (HM3)': '#98FB98',  # Pale Green
+        'SBayesRC (7m)': '#b4c45a'  # olive green
+    }
+
+    # Remove the training set:
+    eval_df = eval_df.loc[~eval_df['Test cohort'].isin(['UKB-EUR', 'UKB-all'])]
+
+    # -----------------------------------
+    # Plot the accuracy metrics:
+
+    fig = plt.figure(figsize=(9, 6.5))
+
+    ax = sns.boxplot(data=eval_df,
+                     x='Test cohort',
+                     hue='Model',
+                     hue_order=model_order,
+                     order=['CARTaGENE-EUR', 'UKB-AMR', 'UKB-MID', 'UKB-CSA', 'UKB-EAS', 'UKB-AFR'],
+                     palette=palette,
+                     showmeans=True,
+                     boxprops=dict(linewidth=.5, edgecolor='black'),
+                     meanprops={'marker': 'o', 'markerfacecolor': 'red', 'markeredgecolor': 'red',
+                                'markersize': 2.5},
+                     y=iargs.metric,
+                     showfliers=False)
+
+    # Rotate the x-tick labels by 30 degrees:
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
+    ax.set_title(r'$\bf{(c)}$' + " Out-of-sample prediction accuracy on Pan-UKB and CARTaGENE cohorts",
+                 x=0.01, horizontalalignment='left')
+
+    # Put legend to the right:
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    ax.set_ylabel('Incremental $R^2$')
+
+    plt.savefig(osp.join(iargs.output_dir, f'model_comparison.{iargs.extension}'), bbox_inches="tight")
+    plt.close()
+
+    """
+    # -----------------------------------
+    # Generate the boxplot for the shared phenotypes only:
+    import glob
+    ukb_pheno = [osp.basename(f).replace('.txt', '') for f in glob.glob('data/phenotypes/ukbb/*.txt')]
+    cag_pheno = [osp.basename(f).replace('.txt', '') for f in glob.glob('data/phenotypes/cartagene/*.txt')]
+
+    shared_pheno = list(set(ukb_pheno).intersection(set(cag_pheno)))
+
+    eval_df_shared_pheno = eval_df.loc[eval_df.phenocode.astype(str).isin(
+        shared_pheno
+    )]
+
+    ax = sns.boxplot(data=eval_df_shared_pheno,
+                     x='Test cohort',
+                     hue='Model',
+                     hue_order=model_order,
+                     palette='Set2',
+                     showmeans=True,
+                     meanprops={'marker': 'o', 'markerfacecolor': 'red', 'markeredgecolor': 'red',
+                                'markersize': 3},
+                     y=iargs.metric, )
+
+    # Rotate the x-tick labels by 30 degrees:
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
+
+    # Put legend to the right:
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    ax.set_ylabel('Incremental $R^2$')
+
+    plt.savefig(osp.join(iargs.output_dir, f'model_comparison_shared_pheno.{iargs.extension}'),
+                bbox_inches="tight")
+    plt.close()
+
+    # -----------------------------------
+
+    pairs_of_methods = [('VIPRS (HapMap3)', 'VIPRS-NOLRLD (HapMap3)'),
+                        ('VIPRS (HapMap3)', 'VIPRS (HapMap3-x)'),
+                        ('VIPRS (HapMap3)', 'VIPRS_v0.0.4 (HapMap3)'),
+                        ('VIPRS (HapMap3)', 'SBayesRC (HapMap3-hq)'),
+                        ('VIPRS (HapMap3)', 'LDpred2-auto (HapMap3)'),
+                        ('VIPRS (HapMap3)', 'SBayesRC (HapMap3; orig)'),
+                        ('SBayesRC (HapMap3-hq)', 'SBayesRC (HapMap3; orig)'),
+                        ('SBayesRC (HapMap3-hq-4cM)', 'SBayesRC (HapMap3; orig)'),
+                        ('SBayesRC (HapMap3-x-4cM)', 'SBayesRC (HapMap3; orig)'),]
+    
+
+    pairs_of_methods = [
+        ('VIPRS v0.1 (HapMap3)', 'VIPRS-GS v0.1 (HapMap3)'),
+        ('VIPRS-GS v0.1 (HapMap3)', 'VIPRS-GSp v0.1 (HapMap3)'),
+        ('VIPRS v0.1 (HapMap3)', 'SBayesRC (HapMap3)'),
+        ('VIPRS-GS v0.1 (HapMap3)', 'SBayesRC (HapMap3)'),
+        ('VIPRS-GSp v0.1 (HapMap3)', 'VIPRS-GSp v0.1 (13m)'),
+        ('VIPRS-GSp v0.1 (HapMap3)', 'VIPRS-GSp v0.1 (18m)'),
+        ('VIPRS-GSp v0.1 (13m)', 'SBayesRC (7m)'),
+    ]
+
+    # Loop over pairs of methods and generate scatter plots:
+    for method1, method2 in pairs_of_methods:
+
+        pivoted_df = pivot_evaluation_df(eval_df.loc[eval_df['Model'].isin([method1, method2])],
+                                         metric=iargs.metric, columns='Model')
+        plot_scatter_per_cohort(pivoted_df,
+                                x_col=iargs.metric + '_' + method1,
+                                x_label=method1,
+                                y_col=iargs.metric + '_' + method2,
+                                y_label=method2,
+                                title=f"Comparison of {method1} vs. {method2}")
+
+        plt.tight_layout()
+        plt.savefig(osp.join(iargs.output_dir, f'model_comparison_{method1}_{method2}.{iargs.extension}'))
+        plt.close()
+    """
+
+
+def plot_method_comparison_computational(iargs):
+
+
+    prof_metrics = extract_aggregate_performance_metrics(model='*VIPRS_*')
+    prof_metrics = prof_metrics.loc[prof_metrics['Model'].isin(
+        ['VIPRS_EM', 'pathwise_VIPRS_GS']
+    )]
+
+    prof_metrics = prof_metrics.loc[prof_metrics['Variant_set'].isin([
+        'hq_imputed_variants_hm3', 'hq_imputed_variants_maf001', 'hq_imputed_variants'
+    ])]
+
+    prof_metrics['Model'] = prof_metrics['Model'].map({
+        'VIPRS_EM': 'VIPRS v0.1 ',
+        'pathwise_VIPRS_GS': 'VIPRS-GS v0.1 ',
+    }) + prof_metrics['Variant_set'].map({
+        'hq_imputed_variants_hm3': '(HM3)',
+        'hq_imputed_variants_maf001': '(13m)',
+        'hq_imputed_variants': '(18m)'
+    })
+
+    prof_metrics = prof_metrics[['Model', 'Total_WallClockTime', 'Peak_Memory_MB']].reset_index(drop=True)
+
+    prof_metrics_external = extract_aggregate_performance_metrics_external()
+
+    prof_metrics_external = prof_metrics_external[['Model', 'Total_WallClockTime', 'Peak_Memory_MB']]
+    prof_metrics_external = prof_metrics_external.loc[prof_metrics_external['Model'].isin([
+        'LDpred2-auto', 'VIPRS_v0.0.4', 'SBayesRC-HapMap3', 'SBayesRC-7m'
+        ])]
+
+    prof_metrics_external['Model'] = prof_metrics_external['Model'].map({
+        'LDpred2-auto': 'LDpred2-auto (HM3)',
+        'VIPRS_v0.0.4': 'VIPRS v0.0.4 (HM3)',
+        'SBayesRC-HapMap3': 'SBayesRC (HM3)',
+        'SBayesRC-7m': 'SBayesRC (7m)'
+    })
+
+    prof_metrics = pd.concat([prof_metrics, prof_metrics_external]).reset_index(drop=True)
+
+    prof_metrics['Peak_Memory_GB'] = prof_metrics['Peak_Memory_MB'] / 1024
+    prof_metrics['Total_WallClockTime'] /= 60.
+
+
+    model_order = ['LDpred2-auto (HM3)', 'VIPRS v0.0.4 (HM3)',
+                   'VIPRS v0.1 (HM3)', 'VIPRS v0.1 (13m)', 'VIPRS v0.1 (18m)',
+                   'VIPRS-GS v0.1 (HM3)', 'VIPRS-GS v0.1 (13m)', 'VIPRS-GS v0.1 (18m)',
+                   'SBayesRC (HM3)', 'SBayesRC (7m)']
+
+    palette = {
+        'LDpred2-auto (HM3)': '#FA8072',  # Salmon
+        'VIPRS v0.0.4 (HM3)': '#D8BFD8',  # Thistle
+        'VIPRS v0.1 (HM3)': '#87CEEB',  # Light Sky Blue
+        'VIPRS v0.1 (13m)': '#20B2AA',  # Light Sea Green
+        'VIPRS v0.1 (18m)': '#008080',  # Teal
+        'VIPRS-GS v0.1 (HM3)': '#FAFAD2',  # Light Goldenrod Yellow
+        'VIPRS-GS v0.1 (13m)': '#FFDAB9',  # Peach Puff
+        'VIPRS-GS v0.1 (18m)': '#FFE4E1',  # Misty Rose
+        'SBayesRC (HM3)': '#98FB98',  # Pale Green
+        'SBayesRC (7m)': '#b4c45a'  # olive green
+    }
+
+    def add_bar_boundary(ax):
+        for bar in ax.patches:
+            bar.set_edgecolor('black')  # Set the color of the border
+            bar.set_linewidth(.5)  # Set the thickness of the border
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(3, 6.5), sharex=True)
+
+    sns.barplot(data=prof_metrics, x='Model', y='Total_WallClockTime',
+                hue='Model',
+                order=model_order,
+                hue_order=model_order,
+                palette=palette,
+                ax=ax1)
+    ax1.set_ylabel('')
+    ax1.grid(axis='x', visible=False)
+    ax1.set_title(r'$\bf{(a)}$' + " Wallclock Time (minutes)", loc='left')
+    ax1.set_yticks(np.arange(0, 280, 30))
+    add_bar_boundary(ax1)
+
+    sns.barplot(data=prof_metrics, x='Model', y='Peak_Memory_GB',
+                hue='Model',
+                order=model_order,
+                hue_order=model_order,
+                palette=palette,
+                ax=ax2)
+    ax2.set_ylabel('')
+    ax2.set_xlabel("Model")
+    ax2.set_title(r'$\bf{(b)}$' + " Peak Memory (GB)", loc='left')
+    ax2.set_xlim(-1, 10)
+    ax2.set_yticks(np.arange(0, 80, 10))
+    add_bar_boundary(ax2)
+
+    # Rotate the x-tick labels by 30 degrees:
+    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90, fontsize='small')
+    plt.tight_layout()
+
+    plt.savefig(osp.join(iargs.output_dir, f'model_comparison_computational.{iargs.extension}'),
+                bbox_inches="tight")
+    plt.close()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Plot the panels of Figure 4.')
@@ -359,7 +499,9 @@ if __name__ == '__main__':
     makedir(args.output_dir)
     makedir(osp.join(args.output_dir, 'figure_data'))
 
-    plot_panels_a_b(args)
-    plot_panel_c(args)
-    plot_panel_d(args)
-    plot_panel_e(args)
+    #plot_panels_a_b(args)
+    #plot_panel_c(args)
+    #plot_panel_d(args)
+    #plot_panel_e(args)
+    plot_method_comparison(args)
+    plot_method_comparison_computational(args)

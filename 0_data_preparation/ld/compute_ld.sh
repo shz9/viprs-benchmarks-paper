@@ -24,6 +24,14 @@ VARIANT_SET=$(basename $EXTRACTFILE .txt)
 DTYPE=${6:-"int8"}  # Data type for the LD matrix
 BACKEND=${7:-"plink"}  # Backend for the LD computation
 
+
+# If the LD estimator is block4cm, ensure that the population is EUR:
+if [[ "${LD_EST}" == "block4cm" && "${POP}" != "EUR" ]]
+then
+  echo "Error: block4cm estimator is only available for the EUR population for now."
+  exit 1
+fi
+
 # If backend is plink, set default output directory to data/ld/
 # else, set it to data/ld_xarray/:
 
@@ -58,6 +66,11 @@ extra_params=()
 if [[ "${LD_EST}" == "windowed" ]]
 then
   extra_params+=("--ld-window-cm" "3")
+elif [[ "${LD_EST}" == "block4cm" ]]
+then
+  # Remove 4cm from the estimator name:
+  LD_EST="block"
+  extra_params+=("--ld-blocks" "data/ldetect_data/EUR_blocks_4cM.bed")
 else
   extra_params+=("--ld-blocks" "data/ldetect_data/${POP}_blocks.bed")
 fi

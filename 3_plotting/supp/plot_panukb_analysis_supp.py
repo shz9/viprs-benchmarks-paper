@@ -15,12 +15,12 @@ import pandas as pd
 import numpy as np
 
 
-def plot_training_r2_improvement(iargs):
+def plot_training_r2_improvement(iargs, model='VIPRS_EM'):
     # Extract the data:
 
     sns.set_context("paper", font_scale=1.)
 
-    eval_df = extract_aggregate_evaluation_metrics(test_cohort='ukbb')
+    eval_df = extract_aggregate_evaluation_metrics(test_cohort='ukbb', model=model)
     eval_df = eval_df.loc[(eval_df['LD_w_MI'] == True) & (eval_df['Training_pop'] == 'EUR') &
                           (eval_df['Test_pop'] == 'EUR')]
     pivoted_df = pivot_evaluation_df(eval_df, metric=iargs.metric)
@@ -93,8 +93,15 @@ def plot_training_r2_improvement(iargs):
     legend_2.get_frame().set_linewidth(0.0)
     legend_ax.add_artist(legend_2)
 
+    model_name_map = {
+        'VIPRS_EM': 'VIPRS',
+        'pathwise_VIPRS_GS': 'VIPRS-GS'
+    }
+
+    fig.suptitle(f"Prediction $R^2$ on training set with different variant sets ({model_name_map[model]})",)
+
     plt.tight_layout()
-    plt.savefig(osp.join(iargs.output_dir, f'training_r2.{iargs.extension}'))
+    plt.savefig(osp.join(iargs.output_dir, f'training_r2_{model}.{iargs.extension}'))
     plt.close()
 
 
@@ -376,14 +383,15 @@ def plot_accuracy_int8_vs_int16(iargs):
     plt.close()
 
 
-def plot_performance_metrics_int16(iargs):
+def plot_stratified_performance_metrics(iargs, dtype='int16'):
 
     sns.set_context("paper", font_scale=1.25)
 
-    prof_metrics = extract_aggregate_performance_metrics(ld_estimator='block_int16_mi')
+    prof_metrics = extract_aggregate_performance_metrics(ld_estimator=f'block_{dtype}_mi',
+                                                         model='VIPRS_EM')
 
     runtime_data = prof_metrics.drop(columns=
-                                     ['LDEstimator', 'phenocode',
+                                     ['LDEstimator', 'phenocode', 'Model',
                                       'Peak_Memory_MB', 'Total_WallClockTime']
                                      ).groupby('Variant_set').mean()
     runtime_data['Total_FitTime'] /= 60.
@@ -403,7 +411,7 @@ def plot_performance_metrics_int16(iargs):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.5, 3), sharey=True)
 
     runtime_data.plot(kind='barh', stacked=True, color=['#9575CD', '#4DB6AC', '#FF7F50'], ax=ax1)
-    ax1.set_title(r'$\bf{(a)}$' + " Wallclock Time (minutes)", loc='left')
+    ax1.set_title("Wallclock Time (minutes)")
     ax1.grid(axis='y', visible=False)
 
     # Memory:
@@ -422,10 +430,10 @@ def plot_performance_metrics_int16(iargs):
                      width=0.5)
     ax1.set_yticklabels(['HapMap3+', 'MAF > 0.001 (13m)', 'MAC > 20 (18m)'])
     ax1.set_ylabel("Variant Set")
-    ax2.set_title(r'$\bf{(b)}$' + " Peak Memory (GB)", loc='left')
+    ax2.set_title("Peak Memory (GB)")
     ax2.set_xlabel('')
 
-    plt.savefig(osp.join(iargs.output_dir, f'int16_performance.{iargs.extension}'), bbox_inches="tight")
+    plt.savefig(osp.join(iargs.output_dir, f'{dtype}_performance.{iargs.extension}'), bbox_inches="tight")
     plt.close()
 
 
@@ -456,7 +464,9 @@ if __name__ == '__main__':
     sns.set_style("whitegrid")
 
     plot_training_r2_improvement(args)
-    plot_prediction_accuracy_hapmap_vs_maf001(args)
-    plot_prediction_accuracy_maf001_vs_mac20(args)
-    plot_accuracy_int8_vs_int16(args)
-    plot_performance_metrics_int16(args)
+    plot_training_r2_improvement(args, model='pathwise_VIPRS_GS')
+    #plot_prediction_accuracy_hapmap_vs_maf001(args)
+    #plot_prediction_accuracy_maf001_vs_mac20(args)
+    #plot_accuracy_int8_vs_int16(args)
+    #plot_stratified_performance_metrics(args, dtype='int8')
+    #plot_stratified_performance_metrics(args)

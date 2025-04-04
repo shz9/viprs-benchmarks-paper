@@ -16,8 +16,8 @@ do
     continue
   fi
 
-  # For the logging file path, take the directory name of the scoring file and replace data/score with log/score:
-  log_path=$(dirname $score_file | sed 's/data\/score/log\/score/g')
+  # For the logging file path, take the scoring file and replace data/score with log/score:
+  log_path=$(echo $score_file | sed 's/data\/score/log\/score/g')
 
   # For the job name, replace log/score with nothing:
   job_name=$(echo $log_path | sed 's/log\/score//g')

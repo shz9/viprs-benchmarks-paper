@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=ctb-sgravel
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=10GB
-#SBATCH --time=01:00:00
+#SBATCH --mem=12GB
+#SBATCH --time=02:00:00
 #SBATCH --output=./log/evaluate/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL

@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=ctb-sgravel
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=3
 #SBATCH --mem=30GB
-#SBATCH --time=05:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=./log/score/%x.out
 #SBATCH --mail-user=shadi.zabad@mail.mcgill.ca
 #SBATCH --mail-type=FAIL
@@ -14,6 +14,7 @@ fit_file=${1:-"data/model_fit/panukb_sumstats/hq_imputed_variants_hm3/EUR/50/VIP
 output_file=${2:-"data/score/cartagene/panukb_sumstats/hq_imputed_variants_hm3/EUR/50"}
 genotype_dir=${3:-"$HOME/projects/ctb-sgravel/cartagene/research/flagship_project/processed_data/flagship_array_imputed_w_cag_and_topmed_r3/PGEN"}
 
+module load StdEnv/2023
 source "env/viprs/bin/activate"
 module load plink
 
@@ -21,6 +22,8 @@ module load plink
 tmp_dir="$SLURM_TMPDIR/$SLURM_JOBID"
 mkdir -p "$tmp_dir/updated_fit_files/"
 mkdir -p "$tmp_dir/score_files/"
+
+echo "> Preparing scoring files..."
 
 # Update the fit file variant IDs to match the .pgen file IDs:
 python 2_panukb_analysis/score/cartagene_score/map_fit_file_ids.py --fit-file "$fit_file" \
