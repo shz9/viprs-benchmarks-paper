@@ -25,7 +25,7 @@ def plot_panel_a(iargs):
                      markersize=7)
     plt.ylabel("Time per Iteration (s)")
     plt.xlabel("Variants per Chromosome")
-    g.set_title(r'$\bf{(a)}$' + " Multi-threading across variants",
+    g.set_title('A',
                 pad=10, loc='left')
     g.legend(title="Threads", bbox_to_anchor=(1, 1), loc='upper left', fontsize='smaller',
              title_fontsize='smaller')
@@ -96,7 +96,7 @@ def plot_panel_a(iargs):
     g = sns.barplot(x='Processes', y='Total_WallClockTime', data=df, hue='Threads')
     plt.ylabel("Wallclock Time (m)")
     plt.xlabel("Processes")
-    g.set_title(r'$\bf{(b)}$' + " Multi-processing & Multi-threading", loc='left')
+    g.set_title('B', loc='left')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a_2.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -148,7 +148,7 @@ def plot_panel_b(iargs):
                 legend=False)
     axs[0].set_ylabel('Peak Memory (GB)')
     axs[0].set_xticklabels(axs[0].get_xticklabels(), rotation=90)
-    axs[0].set_title(r'$\bf{(c)}$', loc='left')
+    axs[0].set_title('C', loc='left')
 
     # Plot the total time:
     sns.barplot(x='LD Mode', y='Total_WallClockTime',
@@ -161,7 +161,7 @@ def plot_panel_b(iargs):
     axs[1].set_ylabel('Wallclock Time (m)')
     # Rotate the x-axis tick labels:
     axs[1].set_xticklabels(axs[1].get_xticklabels(), rotation=90)
-    axs[1].set_title(r'$\bf{(d)}$', loc='left')
+    axs[1].set_title('D', loc='left')
 
     sns.barplot(x='LD Mode', y='TimePerIteration',
                 order=sorted(e_step_df['LD Mode'].unique()),
@@ -171,7 +171,7 @@ def plot_panel_b(iargs):
     axs[2].set_ylabel('Time per Iteration (s)')
     axs[2].set_xticklabels(axs[2].get_xticklabels(), rotation=90)
     axs[2].legend(title='Threads', prop={'size': 10}, title_fontsize=12)
-    axs[2].set_title(r'$\bf{(e)}$', loc='left')
+    axs[2].set_title('E', loc='left')
 
     sub_prof_df = prof_df.loc[~((prof_df['LD Mode'] == 'Triangular+DQF')
                               & (prof_df['LD Data Type'].isin(['float32', 'float64'])))]
@@ -186,7 +186,7 @@ def plot_panel_b(iargs):
     axs[3].set_xticklabels(axs[3].get_xticklabels(), rotation=90)
     axs[3].set_ylabel("LD Matrix Load Time (s)")
     axs[3].legend(prop={'size': 12})
-    axs[3].set_title(r'$\bf{(f)}$', loc='left')
+    axs[3].set_title(r'F', loc='left')
 
     plt.tight_layout()
     plt.savefig(osp.join(iargs.output_dir, f'panel_b.{iargs.extension}'))
@@ -205,7 +205,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Set seaborn context:
-    sns.set_style("whitegrid")
+    link_font("Helvetica")
+    sns.set_theme(style="whitegrid", font="Helvetica")
     sns.set_context("paper", font_scale=2)
 
     # Create the output directory if it does not exist:

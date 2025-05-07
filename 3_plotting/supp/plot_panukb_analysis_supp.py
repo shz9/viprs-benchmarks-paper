@@ -453,7 +453,7 @@ if __name__ == '__main__':
                         default=False,
                         help='Add best fit lines to the scatterplot.')
     parser.add_argument('--metric', dest='metric', type=str,
-                        default='R2_residualized_target',
+                        default='Incremental_R2',
                         help='The metric to plot.')
     args = parser.parse_args()
 
@@ -465,8 +465,8 @@ if __name__ == '__main__':
 
     plot_training_r2_improvement(args)
     plot_training_r2_improvement(args, model='pathwise_VIPRS_GS')
-    #plot_prediction_accuracy_hapmap_vs_maf001(args)
-    #plot_prediction_accuracy_maf001_vs_mac20(args)
-    #plot_accuracy_int8_vs_int16(args)
-    #plot_stratified_performance_metrics(args, dtype='int8')
-    #plot_stratified_performance_metrics(args)
+    plot_prediction_accuracy_hapmap_vs_maf001(args)
+    plot_prediction_accuracy_maf001_vs_mac20(args)
+    plot_accuracy_int8_vs_int16(args)
+    plot_stratified_performance_metrics(args, dtype='int8')
+    plot_stratified_performance_metrics(args)

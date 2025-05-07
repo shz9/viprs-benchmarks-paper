@@ -831,3 +831,13 @@ def add_improvement_annotation(ax, perc_above_bar=0., orientation='vertical', te
                 ha='center', va='bottom', color='black', fontweight='bold')
 
     return ax
+
+
+def link_font(font_name):
+
+    import matplotlib as mpl
+
+    for f in glob.glob("fonts/*.ttf"):
+        if font_name in f:
+            # Add to the font list with a custom name
+            mpl.font_manager.fontManager.addfont(f)

@@ -38,7 +38,7 @@ def plot_panel_a(iargs):
     add_improvement_annotation(ax, perc_above_bar=-0.11, text_offset=0.3, orientation='horizontal')
     plt.xlabel("Storage (GB) per 1m variants")
     plt.ylabel("LD Matrix Resource")
-    plt.title(r"$\bf{(a)}$ LD Storage Requirements", pad=10, loc='left')
+    plt.title("A", pad=10, loc='left')
 
     plt.savefig(osp.join(iargs.output_dir, f'panel_a.{iargs.extension}'), bbox_inches="tight")
     plt.close()
@@ -75,10 +75,10 @@ def plot_panel_b(iargs):
                 palette=model_colors,
                 legend=False)
     ax1.set_xlabel(None)
-    ax1.set_ylabel(None)
+    ax1.set_ylabel('Wallclock Time (m)')
     ax1.set_yticks(np.arange(0, 8, 1))
     ax1.set_ylim(0, 8.)
-    ax1.set_title(r'$\bf{(b)}$' + '\nWallclock Time (m)', pad=10, loc='left')
+    ax1.set_title('B', pad=10, loc='left')
     add_improvement_annotation(ax1, perc_above_bar=.2)
 
     # Plot the peak memory:
@@ -89,10 +89,10 @@ def plot_panel_b(iargs):
                 palette=model_colors,
                 legend=False)
     ax2.set_xlabel(None)
-    ax2.set_ylabel(None)
+    ax2.set_ylabel('Peak Memory (GB)')
     ax2.set_yticks(np.arange(0, 3.5, .5))
     ax2.set_ylim(0, 3.5)
-    ax2.set_title(r'$\bf{(c)}$' + '\nPeak Memory (GB)', pad=10, loc='left')
+    ax2.set_title('C', pad=10, loc='left')
     add_improvement_annotation(ax2, perc_above_bar=.1)
 
     # Plot prediction accuracy:
@@ -104,9 +104,9 @@ def plot_panel_b(iargs):
                 palette=model_colors,
                 legend=False)
     ax3.set_xlabel(None)
-    ax3.set_ylabel(None)
+    ax3.set_ylabel('Prediction' + r' $R^2$')
     ax3.set_yticks(np.arange(0, 0.35, 0.05))
-    ax3.set_title(r'$\bf{(d)}$' + '\nPrediction' + r' $R^2$', pad=10, loc='left')
+    ax3.set_title('D', pad=10, loc='left')
 
     # Plot the avg time per E-Step and per chromosome:
     sns.lineplot(x='n_snps', y='TimePerIteration',
@@ -121,7 +121,7 @@ def plot_panel_b(iargs):
     ax4.set_yscale('log')
     ax4.set_xlabel('Variants per Chromosome')
     ax4.set_ylabel('Time per Iteration (s)')
-    ax4.set_title(r"$\bf{(e)}$ Runtime per coordinate ascent step", loc='left')
+    ax4.set_title("E", loc='left')
 
     def compute_arrow_start_end(data, model1_name='v0.0.4', model2_name='v0.1'):
         """
@@ -198,7 +198,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Set seaborn context:
-    sns.set_style("whitegrid")
+    link_font("Helvetica")
+    sns.set_theme(style="whitegrid", font="Helvetica")
     sns.set_context("paper", font_scale=1.8)
 
     # Create the output directory if it does not exist:

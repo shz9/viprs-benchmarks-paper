@@ -5,14 +5,7 @@ import numpy as np
 import pandas as pd
 from magenpy.utils.system_utils import makedir
 import os.path as osp
-from utils import (
-    extract_aggregate_evaluation_metrics,
-    extract_external_evaluation_metrics,
-    extract_aggregate_performance_metrics,
-    extract_aggregate_performance_metrics_external,
-    pivot_evaluation_df,
-    get_phenotype_category_palette
-)
+from utils import *
 
 
 def plot_scatter_per_cohort(dataset,
@@ -212,14 +205,14 @@ def plot_method_comparison(iargs):
     }) + eval_df['LDEstimator'].apply(lambda x: ['', '-4cM'][x == 'block4cm_int8_mi'])
 
     eval_df = eval_df.loc[eval_df['Model'].isin([
-        'VIPRS v0.1 (HapMap3)', 'VIPRS-GSp v0.1 (HM3)',
+        'VIPRS v0.1 (HM3)', 'VIPRS-GSp v0.1 (HM3)',
         'VIPRS v0.1 (13m)', 'VIPRS-GSp v0.1 (13m)',
         'VIPRS v0.1 (18m)', 'VIPRS-GSp v0.1 (18m)',
     ])]
 
     eval_df['Model'] = eval_df['Model'].map({
-        'VIPRS v0.1 (HapMap3)': 'VIPRS v0.1 (HM3)',
-        'VIPRS-GSp v0.1 (HapMap3)': 'VIPRS-GS v0.1 (HM3)',
+        'VIPRS v0.1 (HM3)': 'VIPRS v0.1 (HM3)',
+        'VIPRS-GSp v0.1 (HM3)': 'VIPRS-GS v0.1 (HM3)',
         'VIPRS v0.1 (13m)': 'VIPRS v0.1 (13m)',
         'VIPRS-GSp v0.1 (13m)': 'VIPRS-GS v0.1 (13m)',
         'VIPRS v0.1 (18m)': 'VIPRS v0.1 (18m)',
@@ -285,7 +278,7 @@ def plot_method_comparison(iargs):
 
     # Rotate the x-tick labels by 30 degrees:
     ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
-    ax.set_title(r'$\bf{(c)}$' + " Out-of-sample prediction accuracy on Pan-UKB and CARTaGENE cohorts",
+    ax.set_title('C',
                  x=0.01, horizontalalignment='left')
 
     # Put legend to the right:
@@ -444,9 +437,9 @@ def plot_method_comparison_computational(iargs):
                 hue_order=model_order,
                 palette=palette,
                 ax=ax1)
-    ax1.set_ylabel('')
+    ax1.set_ylabel('Wallclock Time (m)')
     ax1.grid(axis='x', visible=False)
-    ax1.set_title(r'$\bf{(a)}$' + " Wallclock Time (minutes)", loc='left')
+    ax1.set_title('A', loc='left')
     ax1.set_yticks(np.arange(0, 280, 30))
     add_bar_boundary(ax1)
 
@@ -456,9 +449,9 @@ def plot_method_comparison_computational(iargs):
                 hue_order=model_order,
                 palette=palette,
                 ax=ax2)
-    ax2.set_ylabel('')
+    ax2.set_ylabel('Peak Memory (GB)')
     ax2.set_xlabel("Model")
-    ax2.set_title(r'$\bf{(b)}$' + " Peak Memory (GB)", loc='left')
+    ax2.set_title('B', loc='left')
     ax2.set_xlim(-1, 10)
     ax2.set_yticks(np.arange(0, 80, 10))
     add_bar_boundary(ax2)
@@ -487,12 +480,13 @@ if __name__ == '__main__':
     parser.add_argument('--add-line', dest='add_line', action='store_true',
                         default=False,
                         help='Add best fit lines to the scatterplot.')
-    parser.add_argument('--metric', dest='metric', type=str, default='R2_residualized_target',
+    parser.add_argument('--metric', dest='metric', type=str, default='Incremental_R2',
                         help='The metric to use for the plots.')
     args = parser.parse_args()
 
     # Set seaborn context:
-    sns.set_style("whitegrid")
+    link_font("Helvetica")
+    sns.set_theme(style="whitegrid", font="Helvetica")
     sns.set_context("paper", font_scale=1.25)
 
     # Create the output directory if it does not exist:
